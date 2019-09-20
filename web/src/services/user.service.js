@@ -1,7 +1,7 @@
 import ApiService from "../services/api.service";
-import { TokenService } from "../services/storage.service";
+import { StorageService } from "../services/storage.service";
 
-class AuthenticationError extends Error {
+class UpdateError extends Error {
 	constructor(errorCode, message) {
 		super(message);
 		this.name = this.constructor.name;
@@ -11,36 +11,24 @@ class AuthenticationError extends Error {
 }
 
 const UserService = {
-	register: async function(credentials) {
+	updateUser: async function(credentials) {
 		try {
-			const response = await ApiService.post("http://207.154.196.92/api/auth/register", credentials);
-			TokenService.saveUser(response.data);
-			ApiService.setHeader();
-			ApiService.mount401Interceptor();
-			return response.data;
+			await ApiService.put("http://207.154.196.92/api/user", credentials);
+			StorageService.updateUser(credentials.firstname, credentials.lastname);
 		} catch (error) {
-			throw new AuthenticationError(error.response.status, error.response.data.message);
+			throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
-	login: async function(credentials) {
+	updatePassword: async function(credentials) {
 		try {
-			const response = await ApiService.post("http://207.154.196.92/api/auth/login", credentials);
-			TokenService.saveUser(response.data);
-			ApiService.setHeader();
-			ApiService.mount401Interceptor();
-			return response.data;
+			const response = await ApiService.post("http://207.154.196.92/api/user/changepassword", credentials);
+			return response;
 		} catch (error) {
-			throw new AuthenticationError(error.response.status, error.response.data.message);
+			throw new UpdateError(error.response.status, error.response.data.message);
 		}
-	},
-
-	logout() {
-		TokenService.removeUser();
-		ApiService.removeHeader();
-		ApiService.unmount401Interceptor();
 	}
 };
 
 export default UserService;
-export { UserService, AuthenticationError };
+export { UserService, UpdateError };

@@ -6,14 +6,14 @@ import Vuelidate from "vuelidate";
 import Notifications from "vue-notification";
 import BootstrapVue from "bootstrap-vue";
 import ApiService from "./services/api.service";
-import { TokenService } from "./services/storage.service";
+import { StorageService } from "./services/storage.service";
 import globals from "./globals";
 import Popper from "popper.js";
 
 ApiService.init(process.env.VUE_APP_ROOT_API);
 
 // If token exists set header
-if (TokenService.getToken()) {
+if (StorageService.getToken()) {
 	ApiService.setHeader();
 }
 

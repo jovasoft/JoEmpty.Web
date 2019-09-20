@@ -1,13 +1,13 @@
 import axios from "axios";
 import store from "../store/store";
-import { TokenService } from "../services/storage.service";
+import { StorageService } from "../services/storage.service";
 
 const ApiService = {
 	_401interceptor: null,
 	init() {},
 
 	setHeader() {
-		axios.defaults.headers.common["Authorization"] = `Bearer ${TokenService.getToken()}`;
+		axios.defaults.headers.common["Authorization"] = `Bearer ${StorageService.getToken()}`;
 	},
 
 	removeHeader() {

@@ -139,14 +139,12 @@ export default {
 	metaInfo: {
 		title: "Register"
 	},
-	data() {
-		return {
-			name: "",
-			lastname: "",
-			email: "",
-			password: ""
-		};
-	},
+	data: () => ({
+		name: "",
+		lastname: "",
+		email: "",
+		password: ""
+	}),
 	components: {
 		PerfectScrollbar
 	},
@@ -186,14 +184,14 @@ export default {
 		name: {
 			required,
 			validName: name => {
-				return /^[a-zA-Z_ ğüçışö]*$/.test(name);
+				return /^[a-zA-ZğüçışöĞÜÇİŞÖ]+(?: [a-zA-ZğüçışöĞÜÇİŞÖ]+)*$/.test(name);
 			},
 			minLength: minLength(3)
 		},
 		lastname: {
 			required,
 			validLastname: lastname => {
-				return /^[a-zA-Z_ ğüçışöĞÜÇİŞÖ]*$/.test(lastname);
+				return /^[a-zA-ZğüçışöĞÜÇİŞÖ]+(?: [a-zA-ZğüçışöĞÜÇİŞÖ]+)*$/.test(lastname);
 			},
 			minLength: minLength(3)
 		},

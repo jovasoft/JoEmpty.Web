@@ -67,12 +67,10 @@ export default {
 	metaInfo: {
 		title: "Login"
 	},
-	data() {
-		return {
-			email: "",
-			password: ""
-		};
-	},
+	data: () => ({
+		email: "",
+		password: ""
+	}),
 	validations: {
 		email: {
 			required,
@@ -96,7 +94,6 @@ export default {
 					password: this.password
 				});
 				if (!isSuccess) {
-					console.log("Giriş yapılamadı");
 					this.$notify({
 						group: "auth",
 						type: "error",

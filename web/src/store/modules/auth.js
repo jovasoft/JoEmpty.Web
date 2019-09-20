@@ -1,12 +1,12 @@
 //import axios from "axios";
 import router from "@/router";
-import { UserService, AuthenticationError } from "@/services/user.service";
-import { TokenService } from "@/services/storage.service";
+import { AuthService, AuthenticationError } from "@/services/auth.service";
+import { StorageService } from "@/services/storage.service";
 
 export const namespaced = true;
 
 export const state = {
-	token: TokenService.getToken(),
+	token: StorageService.getToken(),
 	authenticating: false,
 	authenticationErrorCode: 0,
 	authenticationError: ""
@@ -34,7 +34,7 @@ export const actions = {
 	async register({ commit }, credentials) {
 		commit("loginRequest");
 		try {
-			const userData = await UserService.register(credentials);
+			const userData = await AuthService.register(credentials);
 			commit("loginSuccess", userData.token);
 			router.push("/dashboard");
 			return true;
@@ -52,23 +52,30 @@ export const actions = {
 	async login({ commit }, credentials) {
 		commit("loginRequest");
 		try {
-			const userData = await UserService.login(credentials);
+			const userData = await AuthService.login(credentials);
 			commit("loginSuccess", userData.token);
 			router.push(router.history.current.query.redirect || "/dashboard");
 			return true;
 		} catch (error) {
 			if (error instanceof AuthenticationError) {
-				commit("loginError", {
-					errorCode: error.errorCode,
-					errorMessage: error.message
-				});
+				if (error.errorCode == 400) {
+					commit("loginError", {
+						errorCode: error.errorCode,
+						errorMessage: "Mail or password is incorrect."
+					});
+				} else {
+					commit("loginError", {
+						errorCode: error.errorCode,
+						errorMessage: error.message
+					});
+				}
 			}
 			return false;
 		}
 	},
 
 	logout({ commit }) {
-		UserService.logout();
+		AuthService.logout();
 		commit("logoutSuccess");
 		router.push({ name: "landing" });
 	}
