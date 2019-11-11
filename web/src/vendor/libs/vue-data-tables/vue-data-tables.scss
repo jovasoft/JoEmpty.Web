@@ -25,11 +25,6 @@
   top: 50%;
   right: 6px;
   transform: translateY(-50%);
-
-  [dir=rtl] & {
-    right: auto;
-    left: 6px;
-  }
 }
 
 .VuePagination nav {
@@ -51,19 +46,6 @@
 .VueTables__limit label {
   display: inline-block !important;
   margin-right: .5em;
-
-  [dir=rtl] & {
-    margin-right: 0;
-    margin-left: .5em;
-  }
-}
-
-[dir="rtl"] .pull-left {
-  float: right;
-}
-
-[dir="rtl"] .pull-right {
-  float: left;
 }
 
 .default-style {
@@ -89,25 +71,3 @@
   }
 }
 
-.material-style {
-  @import "~@/vendor/styles/_appwork/include-material";
-
-  .VueTables__sort-icon {
-    color: $text-muted;
-    font-size: $font-size-sm;
-  }
-
-  .VuePagination__pagination-item > a {
-    padding: $pagination-padding-y-sm $pagination-padding-x-sm;
-    min-width: calc(#{"#{($font-size-sm * $pagination-line-height) + ($pagination-padding-y-sm * 2)} + #{$pagination-border-width * 2}"});
-    text-align: center;
-    font-size: $font-size-sm;
-
-    @include border-radius($border-radius-sm);
-  }
-
-  .VuePagination__count {
-    color: $text-muted;
-    font-size: $font-size-sm;
-  }
-}

@@ -1,18 +1,73 @@
 <template>
 	<div>
-		<h4 class="font-weight-bold py-3 mb-4">Home</h4>
-		<p>
-			This page is an example of basic layout. For more options use
-			<strong>Vue starter template generator</strong> in the docs.
-		</p>
+		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tables /</span> Vue Tables 2</h4>
+
+		<hr class="container-m-nx border-light mt-0 mb-3" />
+
+		<v-client-table :data="tableData" :columns="columns" :options="options">
+			<template slot="edit" slot-scope="props">
+				<div>
+					<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="edit(props.row)"><i class="ion ion-md-create"></i></b-btn>
+					<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="remove(props.row)"><i class="ion ion-md-close"></i></b-btn>
+				</div>
+			</template>
+		</v-client-table>
 	</div>
 </template>
 
+<style src="@/vendor/libs/vue-data-tables/vue-data-tables.scss" lang="scss"></style>
+
 <script>
+import Vue from "vue";
+import { ClientTable } from "vue-tables-2";
+
+Vue.use(ClientTable);
+
 export default {
-	name: "home",
+	name: "tables-vue-tables-2",
 	metaInfo: {
-		title: "Home"
+		title: "Vue Tables 2 - Tables"
+	},
+	data: () => ({
+		tableData: [],
+		columns: ["Cari Kodu", "Ünvanı", "İl", "İlçe", "Yetkili Adı", "Yetkili Ünvanı", "Düzenle"],
+		options: {
+			perPage: 10,
+			perPageValues: [],
+			pagination: { chunk: 5 },
+			showChildRowToggler: false,
+			sortIcon: {
+				is: "fa-sort",
+				base: "fas",
+				up: "fa-sort-up",
+				down: "fa-sort-down"
+			}
+		}
+	}),
+	created() {
+		// Fetch json data
+		const req = new XMLHttpRequest();
+		req.open("GET", `${this.publicUrl}json/table-new-data.json`);
+
+		req.onload = () => {
+			const data = JSON.parse(req.response);
+
+			// Add IDs for child rows functionality
+			this.tableData = data.map((item, index) => {
+				item["id"] = index;
+				return item;
+			});
+		};
+
+		req.send();
+	},
+	methods: {
+		edit(row) {
+			alert(`Edit: ${row.first_name} ${row.last_name}`);
+		},
+		remove(row) {
+			alert(`Remove: ${row.first_name} ${row.last_name}`);
+		}
 	}
 };
 </script>
