@@ -1,5 +1,5 @@
 //import axios from "axios";
-import router from "@/router";
+import router from "@/router/router";
 import { AuthService, AuthenticationError } from "@/services/auth.service";
 import { StorageService } from "@/services/storage.service";
 
@@ -36,7 +36,7 @@ export const actions = {
 		try {
 			const userData = await AuthService.register(credentials);
 			commit("loginSuccess", userData.token);
-			router.push("/dashboard");
+			router.push("/");
 			return true;
 		} catch (error) {
 			if (error instanceof AuthenticationError) {
@@ -54,7 +54,7 @@ export const actions = {
 		try {
 			const userData = await AuthService.login(credentials);
 			commit("loginSuccess", userData.token);
-			router.push(router.history.current.query.redirect || "/dashboard");
+			router.push(router.history.current.query.redirect || "/");
 			return true;
 		} catch (error) {
 			if (error instanceof AuthenticationError) {
@@ -77,7 +77,7 @@ export const actions = {
 	logout({ commit }) {
 		AuthService.logout();
 		commit("logoutSuccess");
-		router.push({ name: "landing" });
+		router.push({ name: "login" });
 	}
 };
 

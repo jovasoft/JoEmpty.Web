@@ -1,88 +1,32 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Meta from "vue-meta";
-import store from "./store/store";
+import store from "../store/store";
 import globals from "@/globals";
 
-// Layouts
-import AppLayout from "@/layouts/AppLayout";
-import AuthLayout from "@/layouts/AuthLayout";
-import LandingLayout from "@/layouts/BlankLayout";
+// routes
+import authRoutes from "./auth";
+import clientsRoutes from "./clients";
+import errorRoutes from "./error";
+import userRoutes from "./user";
+import contractsRoutes from "./contracts";
+import facilitiesRoutes from "./facilities";
 
 Vue.use(Router);
 Vue.use(Meta);
 
+const ROUTES = [{ path: "", redirect: "/clients/list" }]
+	.concat(authRoutes)
+	.concat(clientsRoutes)
+	.concat(errorRoutes)
+	.concat(userRoutes)
+	.concat(contractsRoutes)
+	.concat(facilitiesRoutes);
+
 const router = new Router({
 	base: process.env.BASE_URL,
 	mode: "history",
-	routes: [
-		{
-			path: "/",
-			meta: {
-				public: true
-			},
-			component: LandingLayout,
-			children: [
-				{
-					path: "",
-					name: "landing",
-					component: () => import("@/pages/Landing")
-				}
-			]
-		},
-		{
-			path: "/dashboard",
-			component: AppLayout,
-			children: [
-				{
-					path: "",
-					name: "dashboard",
-					component: () => import("@/pages/Dashboard/Home")
-				}
-			]
-		},
-		{
-			path: "/auth",
-			meta: {
-				public: true,
-				onlyWhenLoggedOut: true
-			},
-			component: AuthLayout,
-			children: [
-				{
-					path: "login",
-					name: "login",
-					component: () => import("@/pages/Auth/Login")
-				},
-				{
-					path: "register",
-					name: "register",
-					component: () => import("@/pages/Auth/Register")
-				},
-				{
-					path: "forgot-password",
-					name: "forgot-password",
-
-					component: () => import("@/pages/Auth/ForgotPassword")
-				}
-			]
-		},
-		{
-			path: "/user",
-			component: AppLayout,
-			children: [
-				{
-					path: "account-settings",
-					name: "account-settings",
-					component: () => import("@/pages/User/AccountSettings")
-				}
-			]
-		},
-		{
-			path: "*",
-			component: () => import("@/pages/Error/404")
-		}
-	]
+	routes: ROUTES
 });
 
 router.afterEach(() => {

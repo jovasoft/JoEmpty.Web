@@ -1,11 +1,11 @@
 <template>
 	<div>
-		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tables /</span> Vue Tables 2</h4>
+		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Müşteriler /</span> Müşteri Listesi</h4>
 
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 
 		<v-client-table :data="tableData" :columns="columns" :options="options">
-			<template slot="edit" slot-scope="props">
+			<template slot="düzenle" slot-scope="props">
 				<div>
 					<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="edit(props.row)"><i class="ion ion-md-create"></i></b-btn>
 					<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="remove(props.row)"><i class="ion ion-md-close"></i></b-btn>
@@ -24,13 +24,13 @@ import { ClientTable } from "vue-tables-2";
 Vue.use(ClientTable);
 
 export default {
-	name: "tables-vue-tables-2",
+	name: "clients-list",
 	metaInfo: {
-		title: "Vue Tables 2 - Tables"
+		title: "Müşteri Listesi"
 	},
 	data: () => ({
 		tableData: [],
-		columns: ["Cari Kodu", "Ünvanı", "İl", "İlçe", "Yetkili Adı", "Yetkili Ünvanı", "Düzenle"],
+		columns: ["Cari Kodu", "Ünvanı", "İl", "İlçe", "Yetkili Adı", "Yetkili Ünvanı", "düzenle"],
 		options: {
 			perPage: 10,
 			perPageValues: [],
@@ -41,6 +41,16 @@ export default {
 				base: "fas",
 				up: "fa-sort-up",
 				down: "fa-sort-down"
+			},
+			texts: {
+				count: "{count} kayıttan {from} ile {to} arasındakiler gösteriliyor|{count} records|One record",
+				first: "İlk",
+				last: "Son",
+				filter: "Arama:",
+				filterPlaceholder: "Anahtar Kelime",
+				page: "Sayfa:",
+				noResults: "Eşleşen kayıt bulunamadı",
+				loading: "Yükleniyor..."
 			}
 		}
 	}),

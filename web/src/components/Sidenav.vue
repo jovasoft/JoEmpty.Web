@@ -10,7 +10,27 @@
 		</div>
 		<div class="sidenav-divider mt-0"></div>
 		<div class="sidenav-inner py-1">
-			<sidenav-router-link icon="ion ion-ios-contact" to="/dashboard" :exact="true">Home</sidenav-router-link>
+			<sidenav-menu icon="ion ion-md-people" :active="isMenuActive('/clients')" :open="isMenuOpen('/clients')">
+				<template slot="link-text"
+					>Müşteriler</template
+				>
+				<sidenav-router-link to="/clients/list" :exact="true">Müşteri Listesi</sidenav-router-link>
+				<sidenav-router-link to="/clients/add" :exact="true">Müşteri Ekle</sidenav-router-link>
+			</sidenav-menu>
+			<sidenav-menu icon="ion ion-md-copy" :active="isMenuActive('/contracts')" :open="isMenuOpen('/contracts')">
+				<template slot="link-text"
+					>Sözleşmeler</template
+				>
+				<sidenav-router-link to="/contracts/list" :exact="true">Sözleşme Listesi</sidenav-router-link>
+				<sidenav-router-link to="/contracts/add" :exact="true">Sözleşme Ekle</sidenav-router-link>
+			</sidenav-menu>
+			<sidenav-menu icon="ion ion-md-business" :active="isMenuActive('/facilities')" :open="isMenuOpen('/facilities')">
+				<template slot="link-text"
+					>Tesisler</template
+				>
+				<sidenav-router-link to="/facilities/list" :exact="true">Tesis Listesi</sidenav-router-link>
+				<sidenav-router-link to="/facilities/add" :exact="true">Tesis Ekle</sidenav-router-link>
+			</sidenav-menu>
 		</div>
 	</sidenav>
 </template>

@@ -1,5 +1,3 @@
-@import '~@/vendor/styles/_custom-variables/libs';
-
 $vue-form-wizard-icon-size: 2.5rem !default;
 $vue-form-wizard-icon-border-width: 2px !default;
 $vue-form-wizard-icon-font-size: 1rem !default;
@@ -61,11 +59,6 @@ $vue-form-wizard-spacer: 2rem !default;
   cursor: pointer !important;
   cursor: default;
 
-  [dir=rtl] & {
-    margin: 0 0 0 $vue-form-wizard-spacer;
-    padding: 0 ($vue-form-wizard-icon-size + 1.25rem) 0 0;
-  }
-
   &.disabled {
     opacity: .4;
     cursor: default !important;
@@ -99,11 +92,6 @@ $vue-form-wizard-spacer: 2rem !default;
   text-align: center;
   line-height: calc(#{$vue-form-wizard-icon-size} - #{($vue-form-wizard-icon-border-width * 2)});
   opacity: .4;
-
-  [dir=rtl] & {
-    right: 0;
-    left: auto;
-  }
 
   .wizard-nav li > a.disabled & {
     opacity: 1;
@@ -148,12 +136,6 @@ $vue-form-wizard-spacer: 2rem !default;
     @include border-radius($border-radius);
   }
 
-  .form-wizard-boxed-steps .wizard-nav > li > a,
-  &[dir=rtl] .form-wizard-boxed-steps .wizard-nav > li > a {
-    margin-right: $card-spacer-x;
-    margin-left: 0;
-  }
-
   @media (min-width: map-get($grid-breakpoints, md)) {
     .form-wizard-vertical-left,
     .form-wizard-vertical-right {
@@ -185,11 +167,6 @@ $vue-form-wizard-spacer: 2rem !default;
       }
     }
 
-    &[dir=rtl] .form-wizard-vertical-left.form-wizard-boxed-steps .wizard-nav {
-      margin-right: 0;
-      margin-left: map-get($spacers, 3);
-    }
-
     .form-wizard-vertical-right {
       .wizard-navigation {
         flex-direction: row-reverse;
@@ -205,17 +182,6 @@ $vue-form-wizard-spacer: 2rem !default;
       }
     }
 
-    &[dir=rtl] .form-wizard-vertical-right {
-      .wizard-nav > li > a {
-        margin-right: $vue-form-wizard-spacer;
-        margin-left: 0;
-      }
-
-      .wizard-card-footer {
-        text-align: right;
-      }
-    }
-
     .form-wizard-vertical-right.form-wizard-boxed-steps .wizard-nav {
       margin-left: map-get($spacers, 3);
 
@@ -224,132 +190,6 @@ $vue-form-wizard-spacer: 2rem !default;
         margin-left: 0;
       }
     }
-
-    &[dir=rtl] .form-wizard-vertical-right.form-wizard-boxed-steps .wizard-nav {
-      margin-right: map-get($spacers, 3);
-      margin-left: 0;
-
-       > li > a {
-        margin-right: $card-spacer-x;
-      }
-    }
   }
 }
 
-.material-style {
-  @import "~@/vendor/styles/_appwork/include-material";
-
-  .wizard-nav > li {
-    margin-bottom: map-get($spacers, 3);
-  }
-
-  .wizard-nav > li > a,
-  .wizard-nav > li > a > span:not(.text-danger) {
-    color: $body-color !important;
-  }
-
-  .wizard-nav > li > a {
-    font-weight: $font-weight-semibold;
-  }
-
-  .wizard-icon-circle {
-    border-color: $border-color !important;
-  }
-
-  .form-wizard-boxed-steps .wizard-nav {
-    margin-bottom: map-get($spacers, 3);
-    padding: map-get($spacers, 3) 0 0 $card-spacer-x;
-    border: $card-border-width solid $card-border-color;
-    background: $card-bg;
-    box-shadow: $card-shadow;
-
-    @include border-radius($border-radius);
-  }
-
-  .form-wizard-boxed-steps .wizard-nav > li > a,
-  &[dir=rtl] .form-wizard-boxed-steps .wizard-nav > li > a {
-    margin-right: $card-spacer-x;
-    margin-left: 0;
-  }
-
-  @media (min-width: map-get($grid-breakpoints, md)) {
-    .form-wizard-vertical-left,
-    .form-wizard-vertical-right {
-      .wizard-nav {
-        flex-direction: column;
-      }
-
-      .wizard-tab-content {
-        flex-grow: 1;
-      }
-
-      .wizard-nav {
-        align-self: flex-start;
-      }
-      .wizard-nav > li {
-        flex-grow: 0;
-      }
-    }
-
-    .form-wizard-vertical-left .wizard-navigation {
-      flex-direction: row;
-    }
-
-    .form-wizard-vertical-left.form-wizard-boxed-steps .wizard-nav {
-      margin-right: map-get($spacers, 3);
-
-       > li > a {
-        margin-right: $card-spacer-x;
-      }
-    }
-
-    &[dir=rtl] .form-wizard-vertical-left.form-wizard-boxed-steps .wizard-nav {
-      margin-right: 0;
-      margin-left: map-get($spacers, 3);
-    }
-
-    .form-wizard-vertical-right {
-      .wizard-navigation {
-        flex-direction: row-reverse;
-      }
-
-      .wizard-card-footer {
-        text-align: left;
-      }
-
-      .wizard-nav > li > a {
-        margin-right: 0;
-        margin-left: $vue-form-wizard-spacer;
-      }
-    }
-
-    &[dir=rtl] .form-wizard-vertical-right {
-      .wizard-nav > li > a {
-        margin-right: $vue-form-wizard-spacer;
-        margin-left: 0;
-      }
-
-      .wizard-card-footer {
-        text-align: right;
-      }
-    }
-
-    .form-wizard-vertical-right.form-wizard-boxed-steps .wizard-nav {
-      margin-left: map-get($spacers, 3);
-
-       > li > a {
-        margin-right: $card-spacer-x;
-        margin-left: 0;
-      }
-    }
-
-    &[dir=rtl] .form-wizard-vertical-right.form-wizard-boxed-steps .wizard-nav {
-      margin-right: map-get($spacers, 3);
-      margin-left: 0;
-
-       > li > a {
-        margin-right: $card-spacer-x;
-      }
-    }
-  }
-}

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h4 class="font-weight-bold py-3 mb-4">Account settings</h4>
+		<h4 class="font-weight-bold py-3 mb-4">Account Settings</h4>
 
 		<b-card no-body class="overflow-hidden">
 			<div class="row no-gutters row-bordered row-border-light">

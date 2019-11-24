@@ -15,7 +15,7 @@ export default {
 	name: "app",
 	metaInfo: {
 		title: "JOVASOFT",
-		titleTemplate: "%s - JoEmpty"
+		titleTemplate: "%s"
 	},
 	updated() {
 		// Remove loading state
