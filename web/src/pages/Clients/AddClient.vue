@@ -65,7 +65,7 @@
 								<masked-input type="text" class="form-control" placeholder="Cep Telefonu" :mask="phoneMask" />
 							</b-form-group>
 							<b-form-group label="E-Posta" class="col-md-4">
-								<b-input type="email" placeholder="E-Posta" />
+								<masked-input type="text" class="form-control" placeholder="E-Posta" :mask="emailMask" />
 							</b-form-group>
 						</b-form-row>
 						<div v-if="isEdit">
@@ -86,7 +86,9 @@
 			</tab-content>
 
 			<tab-content icon="ion ion-md-clipboard" title="Notlar">
-				<b-card header="Notlar" header-tag="h6" class="mb-3"> <b-textarea placeholder="Notlar" /> </b-card>
+				<b-card header="Notlar" header-tag="h6" class="mb-3">
+					<b-textarea placeholder="Notlar" :rows="4" :max-rows="6" />
+				</b-card>
 			</tab-content>
 
 			<!-- Buttons -->
@@ -101,6 +103,7 @@
 <style src="@/vendor/libs/vue-data-tables/vue-data-tables.scss" lang="scss"></style>
 
 <script>
+import * as textMaskAddons from "text-mask-addons/dist/textMaskAddons";
 import MaskedInput from "vue-text-mask";
 import { FormWizard, TabContent, WizardStep } from "vue-form-wizard";
 import { ClientTable } from "vue-tables-2";
@@ -120,6 +123,7 @@ export default {
 		MaskedInput
 	},
 	data: () => ({
+		emailMask: textMaskAddons.emailMask,
 		phoneMask: ["(", /[1-9]/, /\d/, /\d/, ")", " ", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/],
 		isEdit: false,
 		tableData: [],

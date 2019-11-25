@@ -20,7 +20,7 @@
 				</b-form-row>
 				<b-form-row>
 					<b-form-group label="Tutar" class="col-md-3">
-						<b-input placeholder="Tutar" />
+						<masked-input placeholder="Tutar" type="text" class="form-control" :mask="numberMask" />
 					</b-form-group>
 					<b-form-group label="Para Birimi" class="col-md-3">
 						<b-select :options="['TL', 'Dolar', 'Euro']" />
@@ -31,10 +31,10 @@
 						<b-select :options="['Dahil', 'Hariç']" />
 					</b-form-group>
 					<b-form-group label="Tesis Sayısı" class="col-md-3">
-						<b-input placeholder="Tesis Sayısı" />
+						<masked-input placeholder="Tesis Sayısı" type="text" class="form-control" :mask="numberMask" />
 					</b-form-group>
 				</b-form-row>
-				<b-btn class="btn-block" type="submit" variant="primary">Sözleşme Ekle</b-btn>
+				<b-btn class="btn-flat" type="submit" variant="primary">Sözleşme Ekle</b-btn>
 			</b-form>
 		</b-card>
 	</div>
@@ -43,19 +43,26 @@
 <style src="@/vendor/libs/vuejs-datepicker/vuejs-datepicker.scss" lang="scss"></style>
 
 <script>
+import MaskedInput from "vue-text-mask";
+import * as textMaskAddons from "text-mask-addons/dist/textMaskAddons";
 import Datepicker from "vuejs-datepicker";
 import { en, tr } from "vuejs-datepicker/dist/locale";
+
 export default {
 	name: "contracts-add",
 	metaInfo: {
 		title: "Sözleşme Ekle"
 	},
 	components: {
-		Datepicker
+		Datepicker,
+		MaskedInput
 	},
 	data: () => ({
 		en: en,
-		tr: tr
+		tr: tr,
+		numberMask: textMaskAddons.createNumberMask({
+			prefix: ""
+		})
 	})
 };
 </script>
