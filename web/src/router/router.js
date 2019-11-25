@@ -15,7 +15,7 @@ import facilitiesRoutes from "./facilities";
 Vue.use(Router);
 Vue.use(Meta);
 
-const ROUTES = [{ path: "", redirect: "/clients/list" }]
+const ROUTES = [{ path: "", redirect: "/client-transactions/clients/list" }]
 	.concat(authRoutes)
 	.concat(clientsRoutes)
 	.concat(errorRoutes)

@@ -27,15 +27,24 @@
 						</b-form-group>
 						<b-form-row>
 							<b-form-group label="İl" class="col-md-4">
-								<b-select :options="['İstanbul', 'Ankara', 'İzmir']" />
+								<b-select v-model="il">
+									<option value="" disabled>İl seçiniz</option>
+									<option v-for="(i, index) in iller" :value="i" :key="index">{{ index }}</option>
+								</b-select>
 							</b-form-group>
 							<b-form-group label="İlçe" class="col-md-4">
-								<b-select :options="['California', 'Hawaii', 'Florida', 'Texas', 'Massachusetts', 'Alabama']" />
+								<b-select v-model="ilce" :disabled="!il">
+									<option value="" disabled>İlçe seçiniz</option>
+									<option v-for="(t, index) in il" :key="index">{{ t }}</option>
+								</b-select>
 							</b-form-group>
 							<b-form-group label="Posta Kodu" class="col-md-4">
 								<b-input placeholder="Posta Kodu" />
 							</b-form-group>
 						</b-form-row>
+						<b-form-group label="Notlar">
+							<b-textarea placeholder="Notlar" :rows="4" :max-rows="6" />
+						</b-form-group>
 					</b-form>
 				</b-card>
 			</tab-content>
@@ -85,16 +94,10 @@
 				</b-card>
 			</tab-content>
 
-			<tab-content icon="ion ion-md-clipboard" title="Notlar">
-				<b-card header="Notlar" header-tag="h6" class="mb-3">
-					<b-textarea placeholder="Notlar" :rows="4" :max-rows="6" />
-				</b-card>
-			</tab-content>
-
 			<!-- Buttons -->
-			<b-btn variant="default" slot="prev">Back</b-btn>
-			<b-btn variant="default" slot="next">Next</b-btn>
-			<b-btn variant="primary" slot="finish">Finish</b-btn>
+			<b-btn variant="default" slot="prev">Geri</b-btn>
+			<b-btn variant="default" slot="next">İleri</b-btn>
+			<b-btn variant="primary" slot="finish">Tamamla</b-btn>
 		</form-wizard>
 	</div>
 </template>
@@ -126,6 +129,9 @@ export default {
 		emailMask: textMaskAddons.emailMask,
 		phoneMask: ["(", /[1-9]/, /\d/, /\d/, ")", " ", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/],
 		isEdit: false,
+		iller: [],
+		il: "",
+		ilce: "",
 		tableData: [],
 		columns: ["Ad", "Soyad", "Ünvan", "Departman", "Sabit Telefon", "Cep Telefonu", "E-Posta", "düzenle"],
 		options: {
@@ -153,19 +159,17 @@ export default {
 	created() {
 		// Fetch json data
 		const req = new XMLHttpRequest();
-		//req.open("GET", `${this.publicUrl}json/table-user-data.json`);
+		req.open("GET", `${this.publicUrl}json/locations.json`);
 
 		req.onload = () => {
-			const data = JSON.parse(req.response);
-
-			// Add IDs for child rows functionality
-			this.tableData = data.map((item, index) => {
-				item["id"] = index;
-				return item;
-			});
+			this.iller = JSON.parse(req.response);
 		};
-
 		req.send();
+	},
+	watch: {
+		il() {
+			this.ilce = "";
+		}
 	},
 	methods: {
 		edit() {

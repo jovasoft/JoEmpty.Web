@@ -23,12 +23,12 @@
 						<masked-input placeholder="Tutar" type="text" class="form-control" :mask="numberMask" />
 					</b-form-group>
 					<b-form-group label="Para Birimi" class="col-md-3">
-						<b-select :options="['TL', 'Dolar', 'Euro']" />
+						<b-select value="TL" :options="['TL', 'Dolar', 'Euro']" />
 					</b-form-group>
 				</b-form-row>
 				<b-form-row>
 					<b-form-group label="Sarf Malzeme" class="col-md-3">
-						<b-select :options="['Dahil', 'Hariç']" />
+						<b-select value="Dahil" :options="['Dahil', 'Hariç']" />
 					</b-form-group>
 					<b-form-group label="Tesis Sayısı" class="col-md-3">
 						<masked-input placeholder="Tesis Sayısı" type="text" class="form-control" :mask="numberMask" />

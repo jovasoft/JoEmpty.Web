@@ -10,26 +10,31 @@
 		</div>
 		<div class="sidenav-divider mt-0"></div>
 		<div class="sidenav-inner py-1">
-			<sidenav-menu icon="ion ion-md-people" :active="isMenuActive('/clients')" :open="isMenuOpen('/clients')">
-				<template slot="link-text"
-					>Müşteriler</template
-				>
-				<sidenav-router-link to="/clients/list" :exact="true">Müşteri Listesi</sidenav-router-link>
-				<sidenav-router-link to="/clients/add" :exact="true">Müşteri Ekle</sidenav-router-link>
-			</sidenav-menu>
-			<sidenav-menu icon="ion ion-md-copy" :active="isMenuActive('/contracts')" :open="isMenuOpen('/contracts')">
-				<template slot="link-text"
-					>Sözleşmeler</template
-				>
-				<sidenav-router-link to="/contracts/list" :exact="true">Sözleşme Listesi</sidenav-router-link>
-				<sidenav-router-link to="/contracts/add" :exact="true">Sözleşme Ekle</sidenav-router-link>
-			</sidenav-menu>
-			<sidenav-menu icon="ion ion-md-business" :active="isMenuActive('/facilities')" :open="isMenuOpen('/facilities')">
-				<template slot="link-text"
-					>Tesisler</template
-				>
-				<sidenav-router-link to="/facilities/list" :exact="true">Tesis Listesi</sidenav-router-link>
-				<sidenav-router-link to="/facilities/add" :exact="true">Tesis Ekle</sidenav-router-link>
+			<sidenav-menu icon="ion ion-md-people" :active="isMenuActive('/client-transactions')" :open="isMenuOpen('/client-transactions')">
+				<template slot="link-text">
+					Müşteri İşlemleri
+				</template>
+				<sidenav-menu icon="ion ion-md-person" :active="isMenuActive('/client-transactions/clients')" :open="isMenuOpen('/client-transactions/clients')">
+					<template slot="link-text">
+						Müşteriler
+					</template>
+					<sidenav-router-link to="/client-transactions/clients/list" :exact="true">Müşteri Listesi</sidenav-router-link>
+					<sidenav-router-link to="/client-transactions/clients/add" :exact="true">Müşteri Ekle</sidenav-router-link>
+				</sidenav-menu>
+				<sidenav-menu icon="ion ion-md-copy" :active="isMenuActive('/client-transactions/contracts')" :open="isMenuOpen('/client-transactions/contracts')">
+					<template slot="link-text">
+						Sözleşmeler
+					</template>
+					<sidenav-router-link to="/client-transactions/contracts/list" :exact="true">Sözleşme Listesi</sidenav-router-link>
+					<sidenav-router-link to="/client-transactions/contracts/add" :exact="true">Sözleşme Ekle</sidenav-router-link>
+				</sidenav-menu>
+				<sidenav-menu icon="ion ion-md-business" :active="isMenuActive('/client-transactions/facilities')" :open="isMenuOpen('/client-transactions/facilities')">
+					<template slot="link-text">
+						Tesisler
+					</template>
+					<sidenav-router-link to="/client-transactions/facilities/list" :exact="true">Tesis Listesi</sidenav-router-link>
+					<sidenav-router-link to="/client-transactions/facilities/add" :exact="true">Tesis Ekle</sidenav-router-link>
+				</sidenav-menu>
 			</sidenav-menu>
 		</div>
 	</sidenav>

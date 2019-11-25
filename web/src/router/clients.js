@@ -2,7 +2,7 @@ import AppLayout from "@/layouts/AppLayout";
 
 export default [
 	{
-		path: "/clients",
+		path: "/client-transactions/clients",
 		component: AppLayout,
 		children: [
 			{
