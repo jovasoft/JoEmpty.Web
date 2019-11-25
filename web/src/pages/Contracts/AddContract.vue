@@ -12,10 +12,10 @@
 				</b-form-row>
 				<b-form-row>
 					<b-form-group label="Başlangıç Tarihi" class="col-md-4">
-						<datepicker :language="tr" :bootstrapStyling="true" :monday-first="true" :full-month-name="true" placeholder="Başlangıç Tarihi" :calendar-button="true" calendar-button-icon="ion ion-md-calendar" :clear-button="true" />
+						<datepicker v-model="startDate" :language="tr" :bootstrapStyling="true" :monday-first="true" :full-month-name="true" placeholder="Başlangıç Tarihi" :calendar-button="true" calendar-button-icon="ion ion-md-calendar" :clear-button="true" />
 					</b-form-group>
 					<b-form-group label="Bitiş Tarihi" class="col-md-4">
-						<datepicker :language="tr" :bootstrapStyling="true" :monday-first="true" :full-month-name="true" placeholder="Bitiş Tarihi" :calendar-button="true" calendar-button-icon="ion ion-md-calendar" :clear-button="true" />
+						<datepicker v-model="endDate" :disabledDates="disabledDates" :language="tr" :bootstrapStyling="true" :monday-first="true" :full-month-name="true" placeholder="Bitiş Tarihi" :calendar-button="true" calendar-button-icon="ion ion-md-calendar" :clear-button="true" />
 					</b-form-group>
 				</b-form-row>
 				<b-form-row>
@@ -57,7 +57,17 @@ export default {
 		Datepicker,
 		MaskedInput
 	},
+	watch: {
+		startDate(newValue) {
+			this.disabledDates = {
+				to: new Date(newValue)
+			};
+		}
+	},
 	data: () => ({
+		disabledDates: {},
+		startDate: "",
+		endDate: "",
 		en: en,
 		tr: tr,
 		numberMask: textMaskAddons.createNumberMask({
