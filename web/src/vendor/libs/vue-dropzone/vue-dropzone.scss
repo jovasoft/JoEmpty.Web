@@ -1,4 +1,3 @@
-@import '~@/vendor/styles/_custom-variables/libs';
 
 $dropzone-box-padding: 1.5rem !default;
 $dropzone-icon-size: 1.875rem !default;
@@ -44,11 +43,6 @@ $dropzone-icon-block-size: 3.75rem !default;
     opacity: .5;
     cursor: not-allowed;
   }
-}
-
-[dir=rtl] .dz-hidden-input {
-  right: 0 !important;
-  left: auto !important;
 }
 
 // Default message
@@ -199,9 +193,6 @@ $dropzone-icon-block-size: 3.75rem !default;
   background-repeat: no-repeat;
   box-shadow: 0 0 1.25rem rgba(0, 0, 0, .06);
 
-  [dir=rtl] & {
-    transform: scaleX(-1);
-  }
 }
 
 .dz-error-mark {
@@ -225,10 +216,6 @@ $dropzone-icon-block-size: 3.75rem !default;
   color: #fff;
   text-align: left;
   font-weight: 600;
-
-  [dir=rtl] & {
-    text-align: right;
-  }
 }
 
 // Error state
@@ -334,79 +321,3 @@ $dropzone-icon-block-size: 3.75rem !default;
   }
 }
 
-.material-style {
-  @import "~@/vendor/styles/_appwork/include-material";
-
-  $dropzone-border-color:     $card-border-color;
-  $dropzone-overlay-bg:       $gray-200;
-  $dropzone-thumbnail-bg:     #fff;
-
-  .dropzone {
-    border: 3px dashed $dropzone-border-color;
-  }
-
-  .dz-message {
-    font-size: $h4-font-size;
-
-    .note {
-      color: $text-muted;
-      font-size: $font-size-base;
-    }
-  }
-
-  .dz-preview {
-    border: $card-border-width solid $dropzone-border-color;
-    border-radius: $border-radius;
-    box-shadow: $card-shadow;
-  }
-
-  .dz-size {
-    color: $text-muted;
-  }
-
-  .dz-thumbnail {
-    border-bottom: 1px solid rgba-to-hex($dropzone-border-color);
-    background: $dropzone-thumbnail-bg;
-
-    @include border-top-radius(if($border-radius, calc(#{$border-radius} - 1px), 0));
-  }
-
-  .dz-nopreview {
-    color: $text-muted;
-  }
-
-  .dz-remove {
-    border-top: 1px solid rgba-to-hex($dropzone-border-color);
-    color: $body-color;
-
-    @include border-bottom-radius(if($border-radius, calc(#{$border-radius} - 1px), 0));
-
-    &:hover,
-    &:focus {
-      background: $gray-100;
-      color: $body-color;
-    }
-  }
-
-  .dz-error-mark,
-  .dz-success-mark {
-    background-color: $dropzone-overlay-bg;
-  }
-
-  .dz-error-message {
-    background: rgba(map-get($theme-colors, danger), .8);
-
-    @include border-top-radius($border-radius);
-  }
-
-  @media (min-width: map-get($grid-breakpoints, sm)) {
-    .dz-preview {
-      display: inline-block;
-      width: $dropzone-thumbnail-width + ($dropzone-preview-padding * 2);
-    }
-
-    .dz-thumbnail {
-      width: $dropzone-thumbnail-width;
-    }
-  }
-}

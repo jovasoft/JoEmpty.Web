@@ -1,9 +1,7 @@
 <template>
 	<div>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Müşteriler /</span> Müşteri Listesi</h4>
-
 		<hr class="container-m-nx border-light mt-0 mb-3" />
-
 		<v-client-table :data="tableData" :columns="columns" :options="options">
 			<template slot="düzenle" slot-scope="props">
 				<div>
@@ -55,14 +53,11 @@ export default {
 		}
 	}),
 	created() {
-		// Fetch json data
 		const req = new XMLHttpRequest();
 		req.open("GET", `${this.publicUrl}json/table-new-data.json`);
-
 		req.onload = () => {
 			const data = JSON.parse(req.response);
 
-			// Add IDs for child rows functionality
 			this.tableData = data.map((item, index) => {
 				item["id"] = index;
 				return item;
@@ -70,14 +65,6 @@ export default {
 		};
 
 		req.send();
-	},
-	methods: {
-		edit(row) {
-			alert(`Edit: ${row.first_name} ${row.last_name}`);
-		},
-		remove(row) {
-			alert(`Remove: ${row.first_name} ${row.last_name}`);
-		}
 	}
 };
 </script>
