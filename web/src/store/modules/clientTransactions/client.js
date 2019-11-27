@@ -24,8 +24,7 @@ export const actions = {
 	async Get({ commit }) {
 		try {
 			const response = await ClientService.Get();
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -37,8 +36,7 @@ export const actions = {
 	async GetOne({ commit }, id) {
 		try {
 			const response = await ClientService.GetOne(id);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -50,8 +48,7 @@ export const actions = {
 	async Add({ commit }, client) {
 		try {
 			const response = await ClientService.Add(client);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -63,8 +60,7 @@ export const actions = {
 	async Update({ commit }, client) {
 		try {
 			const response = await ClientService.Update(client);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -76,8 +72,7 @@ export const actions = {
 	async Delete({ commit }, id) {
 		try {
 			const response = await ClientService.Delete(id);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -88,7 +83,7 @@ export const actions = {
 };
 
 export const mutations = {
-	success(state, { response }) {
+	success(state, response) {
 		state.response = response;
 		state.errorCode = 0;
 		state.errorMessage = "";

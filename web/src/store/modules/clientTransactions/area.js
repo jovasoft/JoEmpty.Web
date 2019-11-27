@@ -24,8 +24,7 @@ export const actions = {
 	async Get({ commit }) {
 		try {
 			const response = await AreaService.Get();
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -37,8 +36,7 @@ export const actions = {
 	async GetOne({ commit }, id) {
 		try {
 			const response = await AreaService.GetOne(id);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -50,8 +48,7 @@ export const actions = {
 	async Add({ commit }, area) {
 		try {
 			const response = await AreaService.Add(area);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -63,8 +60,7 @@ export const actions = {
 	async Update({ commit }, area) {
 		try {
 			const response = await AreaService.Update(area);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -76,8 +72,7 @@ export const actions = {
 	async Delete({ commit }, id) {
 		try {
 			const response = await AreaService.Delete(id);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -88,7 +83,7 @@ export const actions = {
 };
 
 export const mutations = {
-	success(state, { response }) {
+	success(state, response) {
 		state.response = response;
 		state.errorCode = 0;
 		state.errorMessage = "";

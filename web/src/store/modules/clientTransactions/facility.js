@@ -24,8 +24,7 @@ export const actions = {
 	async Get({ commit }) {
 		try {
 			const response = await FacilityService.Get();
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -37,8 +36,7 @@ export const actions = {
 	async GetOne({ commit }, id) {
 		try {
 			const response = await FacilityService.GetOne(id);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -50,8 +48,7 @@ export const actions = {
 	async GetByContractFacilities({ commit }, contractId) {
 		try {
 			const response = await FacilityService.GetByContractFacilities(contractId);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -63,8 +60,7 @@ export const actions = {
 	async Add({ commit }, facility) {
 		try {
 			const response = await FacilityService.Add(facility);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -76,8 +72,7 @@ export const actions = {
 	async Update({ commit }, facility) {
 		try {
 			const response = await FacilityService.Update(facility);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -89,8 +84,7 @@ export const actions = {
 	async Delete({ commit }, id) {
 		try {
 			const response = await FacilityService.Delete(id);
-			commit("success");
-			return response;
+			commit("success", response);
 		} catch (error) {
 			commit("error", {
 				errorCode: error.errorCode,
@@ -101,7 +95,7 @@ export const actions = {
 };
 
 export const mutations = {
-	success(state, { response }) {
+	success(state, response) {
 		state.response = response;
 		state.errorCode = 0;
 		state.errorMessage = "";
