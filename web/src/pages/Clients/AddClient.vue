@@ -237,11 +237,6 @@ export default {
 		contactCellPhone: { required },
 		contactEmail: { required, email }
 	},
-	watch: {
-		province() {
-			this.district = "";
-		}
-	},
 	computed: {
 		...mapGetters({
 			clientErrorMessage: "client/errorMessage",
