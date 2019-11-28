@@ -32,7 +32,7 @@
 							<b-form-group label="İl" class="col-md-6">
 								<b-select v-model="province" @blur="$v.province.$touch()">
 									<option value="" disabled>İl seçiniz</option>
-									<option v-for="(p, index) in provinces" :value="p" :key="index">{{ index }}</option>
+									<option v-for="(p, index) in provinces" :value="index" :key="index">{{ index }}</option>
 								</b-select>
 								<template v-if="$v.province.$error">
 									<small v-if="!$v.province.required" class="form-text text-danger">İl boş geçilemez.</small>
@@ -41,7 +41,7 @@
 							<b-form-group label="İlçe" class="col-md-6">
 								<b-select v-model="district" @blur="$v.district.$touch()" :disabled="!province">
 									<option value="" disabled>İlçe seçiniz</option>
-									<option v-for="(d, index) in province" :key="index">{{ d }}</option>
+									<option v-for="(d, index) in provinces[province]" :key="index">{{ d }}</option>
 								</b-select>
 								<template v-if="$v.district.$error">
 									<small v-if="!$v.district.required" class="form-text text-danger">İlçe boş geçilemez.</small>
@@ -165,7 +165,7 @@ export default {
 			filterable: false,
 			perPage: 10,
 			perPageValues: [],
-			pagination: { chunk: 0 },
+			pagination: { chunk: 5 },
 			showChildRowToggler: false,
 			headings: {
 				firstName: "Ad",
@@ -263,6 +263,7 @@ export default {
 		},
 		async addClient() {
 			if (this.validateFirstStep()) {
+				console.log(this.province);
 				if (!this.clientEditMode) {
 					await this.$store.dispatch("client/Add", {
 						currentCode: this.currentCode,
@@ -295,10 +296,11 @@ export default {
 		},
 		async addClientContact(clientId) {
 			this.clientContacts.forEach(async contact => {
-				if (!this.clientEditMode) {
+				console.log(contact);
+				if (!contact.id) {
 					await this.$store.dispatch("clientContact/Add", {
 						clientId: clientId,
-						firstName: contact.firstname,
+						firstName: contact.firstName,
 						lastName: contact.lastName,
 						title: contact.title,
 						department: contact.department,
@@ -309,6 +311,7 @@ export default {
 				} else {
 					await this.$store.dispatch("clientContact/Update", {
 						clientId: clientId,
+						id: contact.id,
 						firstName: contact.firstName,
 						lastName: contact.lastName,
 						title: contact.title,
