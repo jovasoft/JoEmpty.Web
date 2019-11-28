@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Müşteriler /</span> Müşteri Ekle</h4>
+		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Müşteriler /</span> {{ pageTitle }}</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<form-wizard class="form-wizard-vertical-left mb-5">
 			<template slot="step" slot-scope="props">
@@ -19,13 +19,13 @@
 						<b-form-group label="Ünvan">
 							<b-input v-model="title" @blur="$v.title.$touch()" placeholder="Ünvan" />
 							<template v-if="$v.title.$error">
-								<small v-if="!$v.title.required" class="form-text text-danger">Ünvan boş geçilemez.</small>
+								<small v-if="!$v.title.required || !$v.title.validTitle" class="form-text text-danger">Ünvan boş geçilemez.</small>
 							</template>
 						</b-form-group>
 						<b-form-group label="Adres">
 							<b-input v-model="address" @blur="$v.address.$touch()" placeholder="Cadde/Mahalle" />
 							<template v-if="$v.address.$error">
-								<small v-if="!$v.address.required" class="form-text text-danger">Adres boş geçilemez.</small>
+								<small v-if="!$v.address.required || !$v.address.validAddress" class="form-text text-danger">Adres boş geçilemez.</small>
 							</template>
 						</b-form-group>
 						<b-form-row>
@@ -61,13 +61,13 @@
 							<b-form-group label="Ad" class="col-md-6">
 								<b-input v-model="contactName" @blur="$v.contactName.$touch()" placeholder="Ad" />
 								<template v-if="$v.contactName.$error">
-									<small v-if="!$v.contactName.required" class="form-text text-danger">Ad boş geçilemez.</small>
+									<small v-if="!$v.contactName.required || !$v.contactName.validContactName" class="form-text text-danger">Ad boş geçilemez.</small>
 								</template>
 							</b-form-group>
 							<b-form-group label="Soyad" class="col-md-6">
 								<b-input v-model="contactLastName" @blur="$v.contactLastName.$touch()" placeholder="Soyad" />
 								<template v-if="$v.contactLastName.$error">
-									<small v-if="!$v.contactLastName.required" class="form-text text-danger">Soyad boş geçilemez.</small>
+									<small v-if="!$v.contactLastName.required || !$v.contactLastName.validContactLastName" class="form-text text-danger">Soyad boş geçilemez.</small>
 								</template>
 							</b-form-group>
 						</b-form-row>
@@ -96,10 +96,10 @@
 							</b-form-group>
 						</b-form-row>
 						<div v-if="editMode">
-							<b-btn class="btn btn-block" @click="updateClientContact" variant="primary">Yetkiliyi Güncelle</b-btn>
+							<b-btn class="btn btn-block" @click="updateClientContactList" variant="primary">Yetkiliyi Güncelle</b-btn>
 							<b-btn class="btn btn-block" @click.prevent="closeEditing()" variant="secondary">İptal</b-btn>
 						</div>
-						<b-btn class="btn-block" v-if="!editMode" @click="addClientContact" variant="primary">Yetkili Ekle</b-btn>
+						<b-btn class="btn-block" v-if="!editMode" @click="addClientContactList" variant="primary">Yetkili Ekle</b-btn>
 					</b-form>
 					<v-client-table :data="clientContacts" :columns="columns" :options="tableOptions">
 						<template slot="edit" slot-scope="props">
@@ -112,8 +112,8 @@
 				</b-card>
 			</tab-content>
 			<b-btn variant="default" slot="prev">Geri</b-btn>
-			<b-btn variant="default" @click="addClient" slot="next">İleri</b-btn>
-			<b-btn variant="primary" slot="finish">Tamamla</b-btn>
+			<b-btn variant="default" slot="next">İleri</b-btn>
+			<b-btn variant="primary" @click="addClient" slot="finish">Tamamla</b-btn>
 		</form-wizard>
 	</div>
 </template>
@@ -128,6 +128,7 @@ import { FormWizard, TabContent, WizardStep } from "vue-form-wizard";
 import { ClientTable } from "vue-tables-2";
 import { required, email } from "vuelidate/lib/validators";
 import Vue from "vue";
+import { mapGetters } from "vuex";
 
 Vue.use(ClientTable);
 
@@ -136,7 +137,10 @@ export default {
 	metaInfo: {
 		title: "Müşteri Ekle"
 	},
+	props: ["clientId"],
 	data: () => ({
+		clientEditMode: false,
+		pageTitle: "Müşteri Ekle",
 		provinces: [],
 		clientContacts: [],
 		updateIndex: "",
@@ -156,7 +160,7 @@ export default {
 		editMode: false,
 		emailMask: textMaskAddons.emailMask,
 		phoneMask: ["(", /[1-9]/, /\d/, /\d/, ")", " ", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/],
-		columns: ["name", "lastName", "title", "department", "phone", "cellPhone", "email", "edit"],
+		columns: ["firstName", "lastName", "title", "department", "internalNumber", "phoneNumber", "mailAddress", "edit"],
 		tableOptions: {
 			filterable: false,
 			perPage: 10,
@@ -164,13 +168,13 @@ export default {
 			pagination: { chunk: 0 },
 			showChildRowToggler: false,
 			headings: {
-				name: "Ad",
+				firstName: "Ad",
 				lastName: "Soyad",
 				title: "Ünvan",
 				department: "Departman",
-				phone: "Sabit Telefon",
-				cellPhone: "Cep Telefonu",
-				email: "E-Posta",
+				internalNumber: "Sabit Telefon",
+				phoneNumber: "Cep Telefonu",
+				mailAddress: "E-Posta",
 				edit: "Düzenle"
 			},
 			sortIcon: {
@@ -190,12 +194,12 @@ export default {
 		}
 	}),
 	created() {
-		const req = new XMLHttpRequest();
-		req.open("GET", `${this.publicUrl}json/locations.json`);
-		req.onload = () => {
-			this.provinces = JSON.parse(req.response);
-		};
-		req.send();
+		if (this.clientId) {
+			this.clientEditMode = true;
+			this.pageTitle = "Müşteri Düzenle";
+			this.getClient(this.clientId);
+		}
+		this.getLocations();
 	},
 	components: {
 		FormWizard,
@@ -204,12 +208,32 @@ export default {
 		MaskedInput
 	},
 	validations: {
-		title: { required },
-		address: { required },
+		title: {
+			required,
+			validTitle: title => {
+				return /^(?!\s*$).+/.test(title);
+			}
+		},
+		address: {
+			required,
+			validAddress: address => {
+				return /^(?!\s*$).+/.test(address);
+			}
+		},
 		province: { required },
 		district: { required },
-		contactName: { required },
-		contactLastName: { required },
+		contactName: {
+			required,
+			validContactName: contactName => {
+				return /^(?!\s*$).+/.test(contactName);
+			}
+		},
+		contactLastName: {
+			required,
+			validContactLastName: contactLastName => {
+				return /^(?!\s*$).+/.test(contactLastName);
+			}
+		},
 		contactCellPhone: { required },
 		contactEmail: { required, email }
 	},
@@ -218,7 +242,111 @@ export default {
 			this.district = "";
 		}
 	},
+	computed: {
+		...mapGetters({
+			clientErrorMessage: "client/errorMessage",
+			clientErrorCode: "client/errorCode",
+			clientResponse: "client/response",
+			clientContactErrorMessage: "clientContact/errorMessage",
+			clientContactErrorCode: "clientContact/errorCode",
+			clientContactResponse: "clientContact/response"
+		})
+	},
 	methods: {
+		async getClient(clientId) {
+			await this.$store.dispatch("client/GetOne", clientId);
+			if (this.clientResponse != null) {
+				if (this.clientResponse.data.success) {
+					this.fillForms(this.clientResponse.data.data);
+				} else console.log(this.clientResponse.data.message);
+			} else console.log(this.clientErrorMessage);
+		},
+		async addClient() {
+			if (this.validateFirstStep()) {
+				if (!this.clientEditMode) {
+					await this.$store.dispatch("client/Add", {
+						currentCode: this.currentCode,
+						title: this.title,
+						address: this.address,
+						province: this.province,
+						district: this.district,
+						note: this.notes
+					});
+				} else {
+					await this.$store.dispatch("client/Update", {
+						id: this.clientId,
+						client: {
+							currentCode: this.currentCode,
+							title: this.title,
+							address: this.address,
+							province: this.province,
+							district: this.district,
+							note: this.notes
+						}
+					});
+				}
+				if (this.clientResponse != null) {
+					if (this.clientResponse.data.success) {
+						console.log("Müşteri Eklendi/Güncellendi.");
+						this.addClientContact(this.clientResponse.data.data.id);
+					} else console.log(this.clientResponse.data.message);
+				} else console.log(this.clientErrorMessage);
+			}
+		},
+		async addClientContact(clientId) {
+			this.clientContacts.forEach(async contact => {
+				if (!this.clientEditMode) {
+					await this.$store.dispatch("clientContact/Add", {
+						clientId: clientId,
+						firstName: contact.firstname,
+						lastName: contact.lastName,
+						title: contact.title,
+						department: contact.department,
+						internalNumber: contact.internalNumber,
+						phoneNumber: contact.phoneNumber,
+						mailAddress: contact.mailAddress
+					});
+				} else {
+					await this.$store.dispatch("clientContact/Update", {
+						clientId: clientId,
+						firstName: contact.firstName,
+						lastName: contact.lastName,
+						title: contact.title,
+						department: contact.department,
+						internalNumber: contact.internalNumber,
+						phoneNumber: contact.phoneNumber,
+						mailAddress: contact.mailAddress
+					});
+				}
+				if (this.clientContactResponse != null) {
+					if (this.clientContactResponse.data.success) {
+						console.log("Yetkili Eklendi/Güncellendi.");
+					} else console.log(this.clientContactResponse.data.message);
+				} else console.log(this.clientContactErrorMessage);
+			});
+		},
+		async fillForms(client) {
+			await this.$store.dispatch("clientContact/Get", client.id);
+			if (this.clientContactResponse != null) {
+				if (this.clientContactResponse.data.success) {
+					this.clientContacts = this.clientContactResponse.data.data;
+				} else console.log(this.clientContactResponse.data.message);
+			} else console.log(this.clientContactErrorMessage);
+			this.currentCode = client.currentCode;
+			this.title = client.title;
+			this.address = client.address;
+			this.province = client.province;
+			this.district = client.district;
+			this.notes = client.note;
+		},
+		getLocations() {
+			const req = new XMLHttpRequest();
+			req.open("GET", `${this.publicUrl}json/locations.json`);
+			req.onload = () => {
+				this.provinces = JSON.parse(req.response);
+			};
+			req.send();
+		},
 		touchClientContact() {
 			this.$v.contactName.$touch();
 			this.$v.contactLastName.$touch();
@@ -235,48 +363,44 @@ export default {
 		},
 		remove(index) {
 			this.clientContacts.splice(index, 1);
+			this.clearClientContactList();
 		},
 		edit(index, row) {
-			this.contactName = row.name;
+			this.contactName = row.firstName;
 			this.contactLastName = row.lastName;
 			this.contactTitle = row.title;
 			this.contactDepartment = row.department;
-			this.contactPhone = row.phone;
-			this.contactCellPhone = row.cellPhone;
-			this.contactEmail = row.email;
+			this.contactPhone = row.internalNumber;
+			this.contactCellPhone = row.phoneNumber;
+			this.contactEmail = row.mailAddress;
 			this.editMode = true;
 			this.updateIndex = index;
 		},
 		closeEditing() {
-			this.clearClientContact();
+			this.clearClientContactList();
 		},
-		addClient() {
-			if (this.validateFirstStep()) {
-				//
-			}
-		},
-		updateClientContact() {
+		updateClientContactList() {
 			this.touchClientContact();
 			if (!this.$v.contactName.$invalid && !this.$v.contactLastName.$invalid && !this.$v.contactCellPhone.$invalid && !this.$v.contactEmail.$invalid) {
-				this.clientContacts[this.updateIndex].name = this.contactName;
+				this.clientContacts[this.updateIndex].firstName = this.contactName;
 				this.clientContacts[this.updateIndex].lastName = this.contactLastName;
 				this.clientContacts[this.updateIndex].title = this.contactTitle;
 				this.clientContacts[this.updateIndex].department = this.contactDepartment;
-				this.clientContacts[this.updateIndex].phone = this.contactPhone;
-				this.clientContacts[this.updateIndex].cellPhone = this.contactCellPhone;
-				this.clientContacts[this.updateIndex].email = this.contactEmail;
-				this.clearClientContact();
+				this.clientContacts[this.updateIndex].internalNumber = this.contactPhone;
+				this.clientContacts[this.updateIndex].phoneNumber = this.contactCellPhone;
+				this.clientContacts[this.updateIndex].mailAddress = this.contactEmail;
+				this.clearClientContactList();
 			}
 		},
-		addClientContact() {
+		addClientContactList() {
 			this.touchClientContact();
 			if (!this.$v.contactName.$invalid && !this.$v.contactLastName.$invalid && !this.$v.contactCellPhone.$invalid && !this.$v.contactEmail.$invalid) {
-				var contact = { name: this.contactName, lastName: this.contactLastName, title: this.contactTitle, department: this.contactDepartment, phone: this.contactPhone, cellPhone: this.contactCellPhone, email: this.contactEmail };
+				var contact = { firstName: this.contactName, lastName: this.contactLastName, title: this.contactTitle, department: this.contactDepartment, internalNumber: this.contactPhone, phoneNumber: this.contactCellPhone, mailAddress: this.contactEmail };
 				this.clientContacts.push(contact);
-				this.clearClientContact();
+				this.clearClientContactList();
 			}
 		},
-		clearClientContact() {
+		clearClientContactList() {
 			this.$v.$reset();
 			this.contactName = "";
 			this.contactLastName = "";

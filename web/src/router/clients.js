@@ -11,8 +11,9 @@ export default [
 				component: () => import("@/pages/Clients/ListClients")
 			},
 			{
-				path: "add",
+				path: "add/:clientId?",
 				name: "addClients",
+				props: true,
 				component: () => import("@/pages/Clients/AddClient")
 			}
 		]

@@ -21,9 +21,9 @@ export const getters = {
 };
 
 export const actions = {
-	async Get({ commit }) {
+	async Get({ commit }, clientId) {
 		try {
-			const response = await ClientContactService.Get();
+			const response = await ClientContactService.Get(clientId);
 			commit("success", response);
 		} catch (error) {
 			commit("error", {
@@ -59,7 +59,7 @@ export const actions = {
 
 	async Update({ commit }, clientContact) {
 		try {
-			const response = await ClientContactService.Update(clientContact);
+			const response = await ClientContactService.Update(clientContact.clientId, clientContact);
 			commit("success", response);
 		} catch (error) {
 			commit("error", {

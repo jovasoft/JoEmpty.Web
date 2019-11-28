@@ -21,7 +21,7 @@ const ClientService = {
 
 	GetOne: async function(id) {
 		try {
-			const response = await ApiService.Get(ApiService.baseAddress + "client/GetOne/" + id);
+			const response = await ApiService.get(ApiService.baseAddress + "client/GetOne/" + id);
 			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);
@@ -39,7 +39,8 @@ const ClientService = {
 
 	Update: async function(id, client) {
 		try {
-			await ApiService.put(ApiService.baseAddress + "client/" + id, client);
+			const response = await ApiService.put(ApiService.baseAddress + "client/" + id, client);
+			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);
 		}

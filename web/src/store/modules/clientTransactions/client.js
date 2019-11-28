@@ -59,7 +59,7 @@ export const actions = {
 
 	async Update({ commit }, client) {
 		try {
-			const response = await ClientService.Update(client);
+			const response = await ClientService.Update(client.id, client.client);
 			commit("success", response);
 		} catch (error) {
 			commit("error", {

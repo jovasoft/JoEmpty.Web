@@ -2,8 +2,8 @@
 	<div>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Müşteriler /</span> Müşteri Listesi</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
-		<v-client-table :data="tableData" :columns="columns" :options="options">
-			<template slot="düzenle" slot-scope="props">
+		<v-client-table ref="clientTable" :data="clients" :columns="columns" :options="options">
+			<template slot="edit" slot-scope="props">
 				<div>
 					<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="edit(props.row)"><i class="ion ion-md-create"></i></b-btn>
 					<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="remove(props.row)"><i class="ion ion-md-close"></i></b-btn>
@@ -18,6 +18,7 @@
 <script>
 import Vue from "vue";
 import { ClientTable } from "vue-tables-2";
+import { mapGetters } from "vuex";
 
 Vue.use(ClientTable);
 
@@ -26,14 +27,28 @@ export default {
 	metaInfo: {
 		title: "Müşteri Listesi"
 	},
+	computed: {
+		...mapGetters({
+			errorMessage: "client/errorMessage",
+			errorCode: "client/errorCode",
+			response: "client/response"
+		})
+	},
 	data: () => ({
-		tableData: [],
-		columns: ["Cari Kodu", "Ünvanı", "İl", "İlçe", "Yetkili Adı", "Yetkili Ünvanı", "düzenle"],
+		clients: [],
+		columns: ["currentCode", "title", "province", "district", "edit"],
 		options: {
 			perPage: 10,
 			perPageValues: [],
 			pagination: { chunk: 5 },
 			showChildRowToggler: false,
+			headings: {
+				currentCode: "Cari Kod",
+				title: "Ünvan",
+				province: "İl",
+				district: "İlçe",
+				edit: "Düzenle"
+			},
 			sortIcon: {
 				is: "fa-sort",
 				base: "fas",
@@ -41,7 +56,7 @@ export default {
 				down: "fa-sort-down"
 			},
 			texts: {
-				count: "{count} kayıttan {from} ile {to} arasındakiler gösteriliyor|{count} records|One record",
+				count: "{count} kayıttan {from} ile {to} arasındakiler gösteriliyor|{count} kayıt|Bir kayıt",
 				first: "İlk",
 				last: "Son",
 				filter: "Arama:",
@@ -52,19 +67,32 @@ export default {
 			}
 		}
 	}),
-	created() {
-		const req = new XMLHttpRequest();
-		req.open("GET", `${this.publicUrl}json/table-new-data.json`);
-		req.onload = () => {
-			const data = JSON.parse(req.response);
-
-			this.tableData = data.map((item, index) => {
-				item["id"] = index;
-				return item;
-			});
-		};
-
-		req.send();
+	async created() {
+		await this.$store.dispatch("client/Get");
+		if (this.response != null) {
+			if (this.response.data.success) {
+				this.clients = this.response.data.data;
+			} else console.log(this.response.data.message);
+		} else console.log(this.errorMessage);
+	},
+	methods: {
+		edit(row) {
+			this.$router.push({ name: "addClients", params: { clientId: row.id } });
+		},
+		async remove(row) {
+			await this.$store.dispatch("client/Delete", row.id);
+			if (this.response != null) {
+				if (this.response.status == 204) {
+					console.log("Müşteri Silindi.");
+					var indexToDelete = this.clients
+						.map(x => {
+							return x.id;
+						})
+						.indexOf(row.id);
+					this.clients.splice(indexToDelete, 1);
+				} else console.log(this.response.data.message);
+			} else console.log(this.errorMessage);
+		}
 	}
 };
 </script>

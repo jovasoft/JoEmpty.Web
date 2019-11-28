@@ -4,7 +4,7 @@ import { StorageService } from "../services/storage.service";
 
 const ApiService = {
 	_401interceptor: null,
-	baseAddress: "https://localhost:5002/api/",
+	baseAddress: "http://localhost:5002/api/",
 	init() {},
 
 	setHeader() {

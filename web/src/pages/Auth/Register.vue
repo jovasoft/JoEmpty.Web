@@ -89,14 +89,14 @@
 					<b-input maxlength="20" v-model="name" @blur="$v.name.$touch()" />
 					<template v-if="$v.name.$error">
 						<small v-if="!$v.name.required" class="form-text text-danger">Please enter your first name.</small>
-						<small v-if="!$v.name.minLength || !$v.name.validName" class="form-text text-danger">Your name must be at least 3 characters and only contain letters.</small>
+						<small v-if="!$v.name.minLength || !$v.name.validLastname" class="form-text text-danger">Your first name must be at least 3 characters and only contain letters.</small>
 					</template>
 				</b-form-group>
 				<b-form-group label="Your last name">
 					<b-input maxlength="20" v-model="lastname" @blur="$v.lastname.$touch()" />
 					<template v-if="$v.lastname.$error">
 						<small v-if="!$v.lastname.required" class="form-text text-danger">Please enter your last name.</small>
-						<small v-if="!$v.lastname.minLength || !$v.lastname.validLastname" class="form-text text-danger">Your name must be at least 3 characters and only contain letters.</small>
+						<small v-if="!$v.lastname.minLength || !$v.lastname.validLastname" class="form-text text-danger">Your last name must be at least 3 characters and only contain letters.</small>
 					</template>
 				</b-form-group>
 				<b-form-group label="Your email">

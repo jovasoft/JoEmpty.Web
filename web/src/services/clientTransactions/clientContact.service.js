@@ -39,7 +39,8 @@ const ClientContactService = {
 
 	Update: async function(id, clientContact) {
 		try {
-			await ApiService.put(ApiService.baseAddress + "clientContact/" + id, clientContact);
+			const response = await ApiService.put(ApiService.baseAddress + "clientContact/" + id, clientContact);
+			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);
 		}
