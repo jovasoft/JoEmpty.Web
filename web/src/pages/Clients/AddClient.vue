@@ -84,7 +84,7 @@
 							<b-form-group label="Cep Telefonu" class="col-md-4">
 								<masked-input v-model="contactCellPhone" @blur="$v.contactCellPhone.$touch()" type="text" class="form-control" placeholder="Cep Telefonu" :mask="phoneMask" />
 								<template v-if="$v.contactCellPhone.$error">
-									<small v-if="!$v.contactCellPhone.required" class="form-text text-danger">Cep telefonu boş geçilemez.</small>
+									<small v-if="!$v.contactCellPhone.required || !$v.contactCellPhone.validContactCellPhone" class="form-text text-danger">Cep telefonu boş geçilemez.</small>
 								</template>
 							</b-form-group>
 							<b-form-group label="E-Posta" class="col-md-4">
@@ -104,8 +104,8 @@
 					<v-client-table :data="clientContacts" :columns="columns" :options="tableOptions">
 						<template slot="edit" slot-scope="props">
 							<div>
-								<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="edit(props.index - 1, props.row)"><i class="ion ion-md-create"></i></b-btn>
-								<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="remove(props.index - 1)"><i class="ion ion-md-close"></i></b-btn>
+								<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="editContact(props.index - 1, props.row)"><i class="ion ion-md-create"></i></b-btn>
+								<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="removeContact(props.index - 1)"><i class="ion ion-md-close"></i></b-btn>
 							</div>
 						</template>
 					</v-client-table>
@@ -143,6 +143,7 @@ export default {
 		pageTitle: "Müşteri Ekle",
 		provinces: [],
 		clientContacts: [],
+		clientContactsToDelete: [],
 		updateIndex: "",
 		currentCode: "",
 		title: "",
@@ -234,7 +235,12 @@ export default {
 				return /^(?!\s*$).+/.test(contactLastName);
 			}
 		},
-		contactCellPhone: { required },
+		contactCellPhone: {
+			required,
+			validContactCellPhone: contactCellPhone => {
+				return contactCellPhone.replace(/[^0-9]/g, "").length == 10;
+			}
+		},
 		contactEmail: { required, email }
 	},
 	computed: {
@@ -248,17 +254,26 @@ export default {
 		})
 	},
 	methods: {
+		notify(type, title, text) {
+			this.$notify({
+				group: "app",
+				type: type,
+				title: title,
+				text: text,
+				ignoreDuplicates: true,
+				duration: 5000
+			});
+		},
 		async getClient(clientId) {
 			await this.$store.dispatch("client/GetOne", clientId);
 			if (this.clientResponse != null) {
 				if (this.clientResponse.data.success) {
 					this.fillForms(this.clientResponse.data.data);
-				} else console.log(this.clientResponse.data.message);
-			} else console.log(this.clientErrorMessage);
+				} else this.notify("error", "Hata", this.clientResponse.data.message);
+			} else this.notify("error", "Hata", this.clientErrorMessage);
 		},
 		async addClient() {
 			if (this.validateFirstStep()) {
-				console.log(this.province);
 				if (!this.clientEditMode) {
 					await this.$store.dispatch("client/Add", {
 						currentCode: this.currentCode,
@@ -283,15 +298,24 @@ export default {
 				}
 				if (this.clientResponse != null) {
 					if (this.clientResponse.data.success) {
-						console.log("Müşteri Eklendi/Güncellendi.");
+						if (!this.clientEditMode) this.notify("success", "Başarılı", "Müşteri başarıyla eklendi.");
+						else this.notify("success", "Başarılı", "Müşteri başarıyla güncellendi.");
 						this.addClientContact(this.clientResponse.data.data.id);
-					} else console.log(this.clientResponse.data.message);
-				} else console.log(this.clientErrorMessage);
+					} else this.notify("error", "Hata", this.clientResponse.data.message);
+				} else this.notify("error", "Hata", this.clientErrorMessage);
 			}
 		},
 		async addClientContact(clientId) {
+			if (this.clientContactsToDelete.length > 0) {
+				this.clientContactsToDelete.forEach(async contactId => {
+					await this.$store.dispatch("clientContact/Delete", contactId);
+					if (this.clientContactResponse.data != null) {
+						if (this.clientContactResponse.data.success) this.notify("success", "Başarılı", "Yetkili başarıyla silindi.");
+						else this.notify("error", "Hata", this.clientContactResponse.data.message);
+					} else this.notify("error", "Hata", this.clientContactErrorMessage);
+				});
+			}
 			this.clientContacts.forEach(async contact => {
-				console.log(contact);
 				if (!contact.id) {
 					await this.$store.dispatch("clientContact/Add", {
 						clientId: clientId,
@@ -318,9 +342,10 @@ export default {
 				}
 				if (this.clientContactResponse != null) {
 					if (this.clientContactResponse.data.success) {
-						console.log("Yetkili Eklendi/Güncellendi.");
-					} else console.log(this.clientContactResponse.data.message);
-				} else console.log(this.clientContactErrorMessage);
+						if (!this.clientEditMode) this.notify("success", "Başarılı", "Yetkili başarıyla eklendi.");
+						else this.notify("success", "Başarılı", "Yetkili başarıyla güncellendi.");
+					} else this.notify("error", "Hata", this.clientContactResponse.data.message);
+				} else this.notify("error", "Hata", this.clientContactErrorMessage);
 			});
 		},
 		async fillForms(client) {
@@ -328,8 +353,8 @@ export default {
 			if (this.clientContactResponse != null) {
 				if (this.clientContactResponse.data.success) {
 					this.clientContacts = this.clientContactResponse.data.data;
-				} else console.log(this.clientContactResponse.data.message);
-			} else console.log(this.clientContactErrorMessage);
+				} else this.notify("error", "Hata", this.clientContactResponse.data.message);
+			} else this.notify("error", "Hata", this.clientContactErrorMessage);
 			this.currentCode = client.currentCode;
 			this.title = client.title;
 			this.address = client.address;
@@ -359,11 +384,15 @@ export default {
 			if (!this.$v.title.$invalid && !this.$v.address.$invalid && !this.$v.province.$invalid && !this.$v.district.$invalid) return true;
 			else return false;
 		},
-		remove(index) {
+		removeContact(index) {
+			if (this.clientEditMode) {
+				let idToRemove = this.clientContacts[index].id;
+				this.clientContactsToDelete.push(idToRemove);
+			}
 			this.clientContacts.splice(index, 1);
 			this.clearClientContactList();
 		},
-		edit(index, row) {
+		editContact(index, row) {
 			this.contactName = row.firstName;
 			this.contactLastName = row.lastName;
 			this.contactTitle = row.title;

@@ -72,26 +72,36 @@ export default {
 		if (this.response != null) {
 			if (this.response.data.success) {
 				this.clients = this.response.data.data;
-			} else console.log(this.response.data.message);
-		} else console.log(this.errorMessage);
+			} else this.notify("error", "Hata", this.response.data.message);
+		} else this.notify("error", "Hata", this.errorMessage);
 	},
 	methods: {
-		edit(row) {
-			this.$router.push({ name: "addClients", params: { clientId: row.id } });
-		},
 		async remove(row) {
 			await this.$store.dispatch("client/Delete", row.id);
 			if (this.response != null) {
 				if (this.response.status == 204) {
-					console.log("Müşteri Silindi.");
+					this.notify("success", "Başarılı", "Müşteri başarıyla silindi.");
 					var indexToDelete = this.clients
 						.map(x => {
 							return x.id;
 						})
 						.indexOf(row.id);
 					this.clients.splice(indexToDelete, 1);
-				} else console.log(this.response.data.message);
-			} else console.log(this.errorMessage);
+				} else this.notify("error", "Hata", this.response.data.message);
+			} else this.notify("error", "Hata", this.errorMessage);
+		},
+		notify(type, title, text) {
+			this.$notify({
+				group: "app",
+				type: type,
+				title: title,
+				text: text,
+				ignoreDuplicates: true,
+				duration: 5000
+			});
+		},
+		edit(row) {
+			this.$router.push({ name: "addClients", params: { clientId: row.id } });
 		}
 	}
 };
