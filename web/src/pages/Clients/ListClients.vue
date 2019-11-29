@@ -36,16 +36,16 @@ export default {
 	},
 	methods: {
 		async remove(row) {
+			var indexToDelete = this.clients
+				.map(x => {
+					return x.id;
+				})
+				.indexOf(row.id);
+			this.clients.splice(indexToDelete, 1);
 			await this.$store.dispatch("client/Delete", row.id);
 			if (this.response != null) {
 				if (this.response.status == 204) {
 					this.notify("success", "Başarılı", "Müşteri başarıyla silindi.");
-					var indexToDelete = this.clients
-						.map(x => {
-							return x.id;
-						})
-						.indexOf(row.id);
-					this.clients.splice(indexToDelete, 1);
 				} else this.notify("error", "Hata", this.response.data.message);
 			} else this.notify("error", "Hata", this.errorMessage);
 		},

@@ -118,10 +118,10 @@
 		<sweet-modal v-on:close="modalClosing" ref="successModal" icon="success" :hide-close-button="true">
 			<h4 class="font-weight-bold">Müşteri Başarıyla eklendi.</h4>
 			<div>
-				<small v-on:click="refreshPage">Yeni bir müşteri eklemek için tıklayınız.</small>
+				<small style="cursor: pointer;" v-on:click="refreshPage">Yeni bir müşteri eklemek için <span class="font-weight-bold">buraya</span> tıklayınız.</small>
 			</div>
 			<div>
-				<small v-on:click="navigateToAddContract">{{ title }} ünvanlı müşteriye sözleşme eklemek için tıklayınız.</small>
+				<small style="cursor: pointer;" v-on:click="navigateToAddContract">{{ title }} ünvanlı müşteriye sözleşme eklemek için <span class="font-weight-bold">buraya</span> tıklayınız.</small>
 			</div>
 		</sweet-modal>
 	</div>
@@ -149,6 +149,7 @@ export default {
 	},
 	props: ["clientId"],
 	data: () => ({
+		isModalClosing: false,
 		clientEditMode: false,
 		pageTitle: "Müşteri Ekle",
 		provinces: [],
@@ -269,13 +270,15 @@ export default {
 			this.$refs.successModal.open();
 		},
 		modalClosing() {
-			this.$router.push({ name: "listClients" });
+			if (!this.isModalClosing) this.$router.push({ name: "listClients" });
 		},
 		refreshPage() {
+			this.isModalClosing = true;
 			this.$refs.successModal.close();
 			this.$router.go(0);
 		},
 		navigateToAddContract() {
+			this.isModalClosing = true;
 			this.$refs.successModal.close();
 			this.$router.push({ name: "addContract" });
 		},
