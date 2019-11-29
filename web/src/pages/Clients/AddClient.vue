@@ -326,12 +326,13 @@ export default {
 				}
 				if (this.clientResponse != null) {
 					if (this.clientResponse.data.success) {
-						if (!this.clientEditMode) this.showModal();
-						else this.notify("success", "Başarılı", "Müşteri başarıyla güncellendi.");
 						this.addClientContact(this.clientResponse.data.data.id);
 					} else this.notify("error", "Hata", this.clientResponse.data.message);
 				} else this.notify("error", "Hata", this.clientErrorMessage);
 			}
+		},
+		sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
 		},
 		async addClientContact(clientId) {
 			if (this.clientContactsToDelete.length > 0) {
@@ -372,6 +373,11 @@ export default {
 					else this.notify("error", "Hata", this.clientContactResponse.data.message);
 				} else this.notify("error", "Hata", this.clientContactErrorMessage);
 			});
+			if (this.clientEditMode) {
+				this.notify("success", "Başarılı", "Müşteri başarıyla güncellendi.");
+				await this.sleep(1000);
+				this.$router.push({ name: "listClients" });
+			} else this.showModal();
 		},
 		async fillForms(client) {
 			await this.$store.dispatch("clientContact/Get", client.id);
