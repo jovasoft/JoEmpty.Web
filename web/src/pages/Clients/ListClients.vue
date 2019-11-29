@@ -34,6 +34,35 @@ export default {
 			response: "client/response"
 		})
 	},
+	methods: {
+		async remove(row) {
+			await this.$store.dispatch("client/Delete", row.id);
+			if (this.response != null) {
+				if (this.response.status == 204) {
+					this.notify("success", "Başarılı", "Müşteri başarıyla silindi.");
+					var indexToDelete = this.clients
+						.map(x => {
+							return x.id;
+						})
+						.indexOf(row.id);
+					this.clients.splice(indexToDelete, 1);
+				} else this.notify("error", "Hata", this.response.data.message);
+			} else this.notify("error", "Hata", this.errorMessage);
+		},
+		notify(type, title, text) {
+			this.$notify({
+				group: "app",
+				type: type,
+				title: title,
+				text: text,
+				ignoreDuplicates: true,
+				duration: 5000
+			});
+		},
+		edit(row) {
+			this.$router.push({ name: "addClients", params: { clientId: row.id } });
+		}
+	},
 	data: () => ({
 		clients: [],
 		columns: ["currentCode", "title", "province", "district", "edit"],
@@ -74,35 +103,6 @@ export default {
 				this.clients = this.response.data.data;
 			} else this.notify("error", "Hata", this.response.data.message);
 		} else this.notify("error", "Hata", this.errorMessage);
-	},
-	methods: {
-		async remove(row) {
-			await this.$store.dispatch("client/Delete", row.id);
-			if (this.response != null) {
-				if (this.response.status == 204) {
-					this.notify("success", "Başarılı", "Müşteri başarıyla silindi.");
-					var indexToDelete = this.clients
-						.map(x => {
-							return x.id;
-						})
-						.indexOf(row.id);
-					this.clients.splice(indexToDelete, 1);
-				} else this.notify("error", "Hata", this.response.data.message);
-			} else this.notify("error", "Hata", this.errorMessage);
-		},
-		notify(type, title, text) {
-			this.$notify({
-				group: "app",
-				type: type,
-				title: title,
-				text: text,
-				ignoreDuplicates: true,
-				duration: 5000
-			});
-		},
-		edit(row) {
-			this.$router.push({ name: "addClients", params: { clientId: row.id } });
-		}
 	}
 };
 </script>

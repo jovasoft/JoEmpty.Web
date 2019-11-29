@@ -115,6 +115,15 @@
 			<b-btn variant="default" slot="next">İleri</b-btn>
 			<b-btn variant="primary" @click="addClient" slot="finish">Tamamla</b-btn>
 		</form-wizard>
+		<sweet-modal v-on:close="modalClosing" ref="successModal" icon="success" :hide-close-button="true">
+			<h4 class="font-weight-bold">Müşteri Başarıyla eklendi.</h4>
+			<div>
+				<small v-on:click="refreshPage">Yeni bir müşteri eklemek için tıklayınız.</small>
+			</div>
+			<div>
+				<small v-on:click="navigateToAddContract">{{ title }} ünvanlı müşteriye sözleşme eklemek için tıklayınız.</small>
+			</div>
+		</sweet-modal>
 	</div>
 </template>
 
@@ -129,6 +138,7 @@ import { ClientTable } from "vue-tables-2";
 import { required, email } from "vuelidate/lib/validators";
 import Vue from "vue";
 import { mapGetters } from "vuex";
+import { SweetModal } from "sweet-modal-vue";
 
 Vue.use(ClientTable);
 
@@ -206,7 +216,8 @@ export default {
 		FormWizard,
 		TabContent,
 		WizardStep,
-		MaskedInput
+		MaskedInput,
+		SweetModal
 	},
 	validations: {
 		title: {
@@ -254,13 +265,27 @@ export default {
 		})
 	},
 	methods: {
+		showModal() {
+			this.$refs.successModal.open();
+		},
+		modalClosing() {
+			this.$router.push({ name: "listClients" });
+		},
+		refreshPage() {
+			this.$refs.successModal.close();
+			this.$router.go(0);
+		},
+		navigateToAddContract() {
+			this.$refs.successModal.close();
+			this.$router.push({ name: "addContract" });
+		},
 		notify(type, title, text) {
 			this.$notify({
 				group: "app",
 				type: type,
 				title: title,
 				text: text,
-				ignoreDuplicates: true,
+				ignoreDuplicates: false,
 				duration: 5000
 			});
 		},
@@ -276,29 +301,29 @@ export default {
 			if (this.validateFirstStep()) {
 				if (!this.clientEditMode) {
 					await this.$store.dispatch("client/Add", {
-						currentCode: this.currentCode,
-						title: this.title,
-						address: this.address,
+						currentCode: this.currentCode.trim(),
+						title: this.title.trim(),
+						address: this.address.trim(),
 						province: this.province,
 						district: this.district,
-						note: this.notes
+						note: this.notes.trim()
 					});
 				} else {
 					await this.$store.dispatch("client/Update", {
 						id: this.clientId,
 						client: {
-							currentCode: this.currentCode,
-							title: this.title,
-							address: this.address,
+							currentCode: this.currentCode.trim(),
+							title: this.title.trim(),
+							address: this.address.trim(),
 							province: this.province,
 							district: this.district,
-							note: this.notes
+							note: this.notes.trim()
 						}
 					});
 				}
 				if (this.clientResponse != null) {
 					if (this.clientResponse.data.success) {
-						if (!this.clientEditMode) this.notify("success", "Başarılı", "Müşteri başarıyla eklendi.");
+						if (!this.clientEditMode) this.showModal();
 						else this.notify("success", "Başarılı", "Müşteri başarıyla güncellendi.");
 						this.addClientContact(this.clientResponse.data.data.id);
 					} else this.notify("error", "Hata", this.clientResponse.data.message);
@@ -309,9 +334,8 @@ export default {
 			if (this.clientContactsToDelete.length > 0) {
 				this.clientContactsToDelete.forEach(async contactId => {
 					await this.$store.dispatch("clientContact/Delete", contactId);
-					if (this.clientContactResponse.data != null) {
-						if (this.clientContactResponse.data.success) this.notify("success", "Başarılı", "Yetkili başarıyla silindi.");
-						else this.notify("error", "Hata", this.clientContactResponse.data.message);
+					if (this.clientContactResponse != null) {
+						if (!this.clientContactResponse.status == 204) this.notify("error", "Hata", this.clientContactResponse.data.message);
 					} else this.notify("error", "Hata", this.clientContactErrorMessage);
 				});
 			}
@@ -341,20 +365,17 @@ export default {
 					});
 				}
 				if (this.clientContactResponse != null) {
-					if (this.clientContactResponse.data.success) {
-						if (!this.clientEditMode) this.notify("success", "Başarılı", "Yetkili başarıyla eklendi.");
-						else this.notify("success", "Başarılı", "Yetkili başarıyla güncellendi.");
-					} else this.notify("error", "Hata", this.clientContactResponse.data.message);
+					if (this.clientContactResponse.data.success) contact.id = this.clientContactResponse.data.data.id;
+					else this.notify("error", "Hata", this.clientContactResponse.data.message);
 				} else this.notify("error", "Hata", this.clientContactErrorMessage);
 			});
 		},
 		async fillForms(client) {
 			await this.$store.dispatch("clientContact/Get", client.id);
 			if (this.clientContactResponse != null) {
-				if (this.clientContactResponse.data.success) {
-					this.clientContacts = this.clientContactResponse.data.data;
-				} else this.notify("error", "Hata", this.clientContactResponse.data.message);
-			} else this.notify("error", "Hata", this.clientContactErrorMessage);
+				if (this.clientContactResponse.data.success) this.clientContacts = this.clientContactResponse.data.data;
+				else this.notify("error", "Hata", this.clientContactResponse.data.message);
+			}
 			this.currentCode = client.currentCode;
 			this.title = client.title;
 			this.address = client.address;
@@ -409,10 +430,10 @@ export default {
 		updateClientContactList() {
 			this.touchClientContact();
 			if (!this.$v.contactName.$invalid && !this.$v.contactLastName.$invalid && !this.$v.contactCellPhone.$invalid && !this.$v.contactEmail.$invalid) {
-				this.clientContacts[this.updateIndex].firstName = this.contactName;
-				this.clientContacts[this.updateIndex].lastName = this.contactLastName;
-				this.clientContacts[this.updateIndex].title = this.contactTitle;
-				this.clientContacts[this.updateIndex].department = this.contactDepartment;
+				this.clientContacts[this.updateIndex].firstName = this.contactName.trim();
+				this.clientContacts[this.updateIndex].lastName = this.contactLastName.trim();
+				this.clientContacts[this.updateIndex].title = this.contactTitle.trim();
+				this.clientContacts[this.updateIndex].department = this.contactDepartment.trim();
 				this.clientContacts[this.updateIndex].internalNumber = this.contactPhone;
 				this.clientContacts[this.updateIndex].phoneNumber = this.contactCellPhone;
 				this.clientContacts[this.updateIndex].mailAddress = this.contactEmail;
@@ -422,7 +443,7 @@ export default {
 		addClientContactList() {
 			this.touchClientContact();
 			if (!this.$v.contactName.$invalid && !this.$v.contactLastName.$invalid && !this.$v.contactCellPhone.$invalid && !this.$v.contactEmail.$invalid) {
-				var contact = { firstName: this.contactName, lastName: this.contactLastName, title: this.contactTitle, department: this.contactDepartment, internalNumber: this.contactPhone, phoneNumber: this.contactCellPhone, mailAddress: this.contactEmail };
+				var contact = { firstName: this.contactName.trim(), lastName: this.contactLastName.trim(), title: this.contactTitle.trim(), department: this.contactDepartment.trim(), internalNumber: this.contactPhone, phoneNumber: this.contactCellPhone, mailAddress: this.contactEmail };
 				this.clientContacts.push(contact);
 				this.clearClientContactList();
 			}

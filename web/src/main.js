@@ -9,6 +9,7 @@ import ApiService from "./services/api.service";
 import { StorageService } from "./services/storage.service";
 import globals from "./globals";
 import Popper from "popper.js";
+import SweetModal from "sweet-modal-vue/src/plugin.js";
 
 ApiService.init(process.env.VUE_APP_ROOT_API);
 
@@ -25,6 +26,7 @@ Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
 Vue.use(Vuelidate);
 Vue.use(Notifications);
+Vue.use(SweetModal);
 
 // Global RTL flag
 Vue.mixin({

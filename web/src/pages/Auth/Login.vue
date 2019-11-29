@@ -65,7 +65,7 @@ import { required, email } from "vuelidate/lib/validators/";
 import { mapGetters } from "vuex";
 export default {
 	metaInfo: {
-		title: "Login"
+		title: "Giriş"
 	},
 	data: () => ({
 		email: "",

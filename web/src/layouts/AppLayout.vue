@@ -8,7 +8,7 @@
 
 				<div class="layout-content">
 					<div class="router-transitions container-fluid flex-grow-1 container-p-y">
-						<notifications group="app" position="bottom right" />
+						<notifications group="app" :width="300" position="bottom right" />
 						<router-view :key="$route.fullPath" />
 					</div>
 
