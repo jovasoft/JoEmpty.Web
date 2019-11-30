@@ -11,8 +11,9 @@ export default [
 				component: () => import("@/pages/Contracts/ListContracts")
 			},
 			{
-				path: "add",
+				path: "add/:clientId?/:contractId?",
 				name: "addContract",
+				props: true,
 				component: () => import("@/pages/Contracts/AddContract")
 			}
 		]

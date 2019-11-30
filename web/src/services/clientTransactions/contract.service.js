@@ -21,14 +21,14 @@ const ContractService = {
 
 	GetOne: async function(id) {
 		try {
-			const response = await ApiService.Get(ApiService.baseAddress + "contract/GetOne/" + id);
+			const response = await ApiService.get(ApiService.baseAddress + "contract/GetOne/" + id);
 			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
-	GetByClientContracts: async function(clientId) {
+	GetContractsByClient: async function(clientId) {
 		try {
 			const response = await ApiService.get(ApiService.baseAddress + "contract/GetByClientContracts/" + clientId);
 			return response;

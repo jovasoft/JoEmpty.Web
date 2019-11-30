@@ -116,7 +116,7 @@
 			<b-btn variant="primary" @click="addClient" slot="finish">Tamamla</b-btn>
 		</form-wizard>
 		<sweet-modal v-on:close="modalClosing" ref="successModal" icon="success" :hide-close-button="true">
-			<h4 class="font-weight-bold">Müşteri Başarıyla eklendi.</h4>
+			<h4 class="font-weight-bold">Müşteri Başarıyla Eklendi.</h4>
 			<div>
 				<small style="cursor: pointer;" v-on:click="refreshPage">Yeni bir müşteri eklemek için <span class="font-weight-bold">buraya</span> tıklayınız.</small>
 			</div>
@@ -280,7 +280,7 @@ export default {
 		navigateToAddContract() {
 			this.isModalClosing = true;
 			this.$refs.successModal.close();
-			this.$router.push({ name: "addContract" });
+			this.$router.push({ name: "addContract", params: { clientId: this.clientResponse.data.data.id } });
 		},
 		notify(type, title, text) {
 			this.$notify({

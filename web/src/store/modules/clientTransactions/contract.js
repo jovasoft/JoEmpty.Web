@@ -45,9 +45,9 @@ export const actions = {
 		}
 	},
 
-	async GetByClientContracts({ commit }, clientId) {
+	async GetContractsByClient({ commit }, clientId) {
 		try {
-			const response = await ContractService.GetByClientContracts(clientId);
+			const response = await ContractService.GetContractsByClient(clientId);
 			commit("success", response);
 		} catch (error) {
 			commit("error", {

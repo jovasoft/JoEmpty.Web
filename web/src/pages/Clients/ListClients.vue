@@ -49,6 +49,9 @@ export default {
 				} else this.notify("error", "Hata", this.response.data.message);
 			} else this.notify("error", "Hata", this.errorMessage);
 		},
+		edit(row) {
+			this.$router.push({ name: "addClients", params: { clientId: row.id } });
+		},
 		notify(type, title, text) {
 			this.$notify({
 				group: "app",
@@ -58,9 +61,6 @@ export default {
 				ignoreDuplicates: true,
 				duration: 5000
 			});
-		},
-		edit(row) {
-			this.$router.push({ name: "addClients", params: { clientId: row.id } });
 		}
 	},
 	data: () => ({
