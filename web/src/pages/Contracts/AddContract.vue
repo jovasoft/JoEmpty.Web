@@ -287,7 +287,7 @@ export default {
 		},
 		modalClosing() {
 			if (!this.isModalClosing) {
-				this.$router.push({ name: "listContracts" });
+				this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
 			}
 		},
 		refreshPage() {
