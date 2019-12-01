@@ -125,7 +125,7 @@ export default {
 		endDate: "",
 		price: "",
 		currency: "TL",
-		supply: "External",
+		supply: "Internal",
 		facilityCount: "",
 		startDisabledDates: {
 			to: new Date(2010, 1, 1)

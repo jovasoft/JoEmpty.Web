@@ -42,7 +42,7 @@ export default {
 		clientId: "",
 		clients: [],
 		contracts: [],
-		columns: ["code", "amount", "currency", "supply", "facilityCount", "startDate", "finishDate", "edit"],
+		columns: ["code", "amount", "currency", "supply", "facilityCount", "formattedStartDate", "formattedFinishDate", "edit"],
 		options: {
 			filterable: true,
 			perPage: 10,
@@ -55,8 +55,8 @@ export default {
 				currency: "Para Birimi",
 				supply: "Sarf Malzeme",
 				facilityCount: "Tesis Sayısı",
-				startDate: "Başlangıç Tarihi",
-				finishDate: "Bitiş Tarihi",
+				formattedStartDate: "Başlangıç Tarihi",
+				formattedFinishDate: "Bitiş Tarihi",
 				edit: "Düzenle"
 			},
 			sortIcon: {
