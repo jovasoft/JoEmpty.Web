@@ -25,7 +25,7 @@
 					<template slot="link-text">
 						Sözleşmeler
 					</template>
-					<sidenav-router-link to="/client-transactions/contracts/list" :exact="true">Sözleşme Listesi</sidenav-router-link>
+					<sidenav-router-link to="/client-transactions/contracts/list">Sözleşme Listesi</sidenav-router-link>
 					<sidenav-router-link to="/client-transactions/contracts/add">Sözleşme Ekle</sidenav-router-link>
 				</sidenav-menu>
 				<sidenav-menu icon="ion ion-md-business" :active="isMenuActive('/client-transactions/facilities')" :open="isMenuOpen('/client-transactions/facilities')">
