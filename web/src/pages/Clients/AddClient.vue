@@ -355,7 +355,7 @@ export default {
 			if (this.clientContactResponse != null) {
 				if (this.clientContactResponse.data.success) this.clientContacts = this.clientContactResponse.data.data;
 				else this.notify("error", "Hata", this.clientContactResponse.data.message);
-			}
+			} else if (this.clientContactErrorCode != 404) this.notify("error", "Hata", this.clientContactErrorMessage);
 			this.currentCode = client.currentCode;
 			this.title = client.title;
 			this.address = client.address;

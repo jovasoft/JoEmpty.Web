@@ -119,8 +119,14 @@ export default {
 			await this.$store.dispatch("contract/Get");
 			if (this.contractResponse != null) {
 				if (this.contractResponse.data.success) this.contracts = this.contractResponse.data.data;
-				else this.notify("error", "Hata", this.contractResponse.data.message);
-			} else this.notify("error", "Hata", this.clientErrorMessage);
+				else {
+					this.notify("error", "Hata", this.contractResponse.data.message);
+					this.contracts = [];
+				}
+			} else {
+				if (this.contractErrorCode != 404) this.notify("error", "Hata", this.contractErrorMessage);
+				this.contracts = [];
+			}
 		},
 		async getContractByClient(clientId) {
 			await this.$store.dispatch("contract/GetContractsByClient", clientId);
@@ -131,7 +137,7 @@ export default {
 					this.contracts = [];
 				}
 			} else {
-				this.notify("error", "Hata", this.contractErrorMessage);
+				if (this.contractErrorCode != 404) this.notify("error", "Hata", this.contractErrorMessage);
 				this.contracts = [];
 			}
 		},

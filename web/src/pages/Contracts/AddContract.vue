@@ -221,7 +221,7 @@ export default {
 				if (this.clientResponse.data.success) {
 					this.clients = this.clientResponse.data.data;
 				} else this.notify("error", "Hata", this.clientResponse.data.message);
-			} else this.notify("error", "Hata", this.clientErrorMessage);
+			} else if (this.clientErrorCode != 404) this.notify("error", "Hata", this.clientErrorMessage);
 		},
 		async addContract() {
 			this.$v.$touch();

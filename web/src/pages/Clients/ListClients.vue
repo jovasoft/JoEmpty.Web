@@ -67,15 +67,18 @@ export default {
 			response: "client/response"
 		})
 	},
-	async created() {
-		await this.$store.dispatch("client/Get");
-		if (this.response != null) {
-			if (this.response.data.success) {
-				this.clients = this.response.data.data;
-			} else this.notify("error", "Hata", this.response.data.message);
-		} else this.notify("error", "Hata", this.errorMessage);
+	created() {
+		this.getClients();
 	},
 	methods: {
+		async getClients() {
+			await this.$store.dispatch("client/Get");
+			if (this.response != null) {
+				if (this.response.data.success) {
+					this.clients = this.response.data.data;
+				} else this.notify("error", "Hata", this.response.data.message);
+			} else if (this.errorCode != 404) this.notify("error", "Hata", this.errorMessage);
+		},
 		async remove(row) {
 			var indexToDelete = this.clients
 				.map(x => {
