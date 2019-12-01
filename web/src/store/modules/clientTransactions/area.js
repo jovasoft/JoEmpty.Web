@@ -3,6 +3,7 @@ import { AreaService } from "@/services/clientTransactions/area.service";
 export const namespaced = true;
 
 export const state = {
+	status: "init",
 	response: null,
 	errorCode: 0,
 	errorMessage: ""
@@ -17,12 +18,16 @@ export const getters = {
 	},
 	errorMessage: state => {
 		return state.errorMessage;
+	},
+	status: state => {
+		return state.status;
 	}
 };
 
 export const actions = {
 	async Get({ commit }) {
 		try {
+			commit("changeStatus", "loading");
 			const response = await AreaService.Get();
 			commit("success", response);
 		} catch (error) {
@@ -35,6 +40,7 @@ export const actions = {
 
 	async GetOne({ commit }, id) {
 		try {
+			commit("changeStatus", "loading");
 			const response = await AreaService.GetOne(id);
 			commit("success", response);
 		} catch (error) {
@@ -47,6 +53,7 @@ export const actions = {
 
 	async Add({ commit }, area) {
 		try {
+			commit("changeStatus", "loading");
 			const response = await AreaService.Add(area);
 			commit("success", response);
 		} catch (error) {
@@ -59,6 +66,7 @@ export const actions = {
 
 	async Update({ commit }, area) {
 		try {
+			commit("changeStatus", "loading");
 			const response = await AreaService.Update(area);
 			commit("success", response);
 		} catch (error) {
@@ -71,6 +79,7 @@ export const actions = {
 
 	async Delete({ commit }, id) {
 		try {
+			commit("changeStatus", "loading");
 			const response = await AreaService.Delete(id);
 			commit("success", response);
 		} catch (error) {
@@ -87,11 +96,17 @@ export const mutations = {
 		state.response = response;
 		state.errorCode = 0;
 		state.errorMessage = "";
+		state.status = "loaded";
 	},
 
 	error(state, { errorCode, errorMessage }) {
 		state.response = null;
 		state.errorCode = errorCode;
 		state.errorMessage = errorMessage;
+		state.status = "failed";
+	},
+
+	changeStatus(state, status) {
+		state.status = status;
 	}
 };
