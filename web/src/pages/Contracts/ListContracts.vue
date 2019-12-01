@@ -36,6 +36,7 @@ export default {
 	metaInfo: {
 		title: "Sözleşme Listesi"
 	},
+	props: ["contractsClientId"],
 	data: () => ({
 		clientId: "",
 		clients: [],
@@ -85,8 +86,9 @@ export default {
 			clientResponse: "client/response"
 		})
 	},
-	created() {
-		this.getClients();
+	async created() {
+		await this.getClients();
+		if (this.contractsClientId) this.clientId = this.contractsClientId;
 	},
 	watch: {
 		clientId(id) {

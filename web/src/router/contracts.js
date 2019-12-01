@@ -6,8 +6,9 @@ export default [
 		component: AppLayout,
 		children: [
 			{
-				path: "list",
+				path: "list/:contractsClientId?",
 				name: "listContracts",
+				props: true,
 				component: () => import("@/pages/Contracts/ListContracts")
 			},
 			{

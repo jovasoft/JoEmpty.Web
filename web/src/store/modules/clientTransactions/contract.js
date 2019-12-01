@@ -71,7 +71,7 @@ export const actions = {
 
 	async Update({ commit }, contract) {
 		try {
-			const response = await ContractService.Update(contract);
+			const response = await ContractService.Update(contract.id, contract.contract);
 			commit("success", response);
 		} catch (error) {
 			commit("error", {

@@ -266,32 +266,6 @@ export default {
 		})
 	},
 	methods: {
-		showModal() {
-			this.$refs.successModal.open();
-		},
-		modalClosing() {
-			if (!this.isModalClosing) this.$router.push({ name: "listClients" });
-		},
-		refreshPage() {
-			this.isModalClosing = true;
-			this.$refs.successModal.close();
-			this.$router.go(0);
-		},
-		navigateToAddContract() {
-			this.isModalClosing = true;
-			this.$refs.successModal.close();
-			this.$router.push({ name: "addContract", params: { clientId: this.clientResponse.data.data.id } });
-		},
-		notify(type, title, text) {
-			this.$notify({
-				group: "app",
-				type: type,
-				title: title,
-				text: text,
-				ignoreDuplicates: false,
-				duration: 5000
-			});
-		},
 		async getClient(clientId) {
 			await this.$store.dispatch("client/GetOne", clientId);
 			if (this.clientResponse != null) {
@@ -330,9 +304,6 @@ export default {
 					} else this.notify("error", "Hata", this.clientResponse.data.message);
 				} else this.notify("error", "Hata", this.clientErrorMessage);
 			}
-		},
-		sleep(ms) {
-			return new Promise(resolve => setTimeout(resolve, ms));
 		},
 		async addClientContact(clientId) {
 			if (this.clientContactsToDelete.length > 0) {
@@ -400,6 +371,32 @@ export default {
 			};
 			req.send();
 		},
+		notify(type, title, text) {
+			this.$notify({
+				group: "app",
+				type: type,
+				title: title,
+				text: text,
+				ignoreDuplicates: false,
+				duration: 5000
+			});
+		},
+		showModal() {
+			this.$refs.successModal.open();
+		},
+		modalClosing() {
+			if (!this.isModalClosing) this.$router.push({ name: "listClients" });
+		},
+		refreshPage() {
+			this.isModalClosing = true;
+			this.$refs.successModal.close();
+			this.$router.go(0);
+		},
+		navigateToAddContract() {
+			this.isModalClosing = true;
+			this.$refs.successModal.close();
+			this.$router.push({ name: "addContract", params: { clientId: this.clientResponse.data.data.id } });
+		},
 		touchClientContact() {
 			this.$v.contactName.$touch();
 			this.$v.contactLastName.$touch();
@@ -433,9 +430,6 @@ export default {
 			this.editMode = true;
 			this.updateIndex = index;
 		},
-		closeEditing() {
-			this.clearClientContactList();
-		},
 		updateClientContactList() {
 			this.touchClientContact();
 			if (!this.$v.contactName.$invalid && !this.$v.contactLastName.$invalid && !this.$v.contactCellPhone.$invalid && !this.$v.contactEmail.$invalid) {
@@ -468,6 +462,12 @@ export default {
 			this.contactEmail = "";
 			this.editMode = false;
 			this.updateIndex = "";
+		},
+		closeEditing() {
+			this.clearClientContactList();
+		},
+		sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
 		}
 	}
 };

@@ -48,7 +48,8 @@ const ContractService = {
 
 	Update: async function(id, contract) {
 		try {
-			await ApiService.put(ApiService.baseAddress + "contract/" + id, contract);
+			const response = await ApiService.put(ApiService.baseAddress + "contract/" + id, contract);
+			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);
 		}

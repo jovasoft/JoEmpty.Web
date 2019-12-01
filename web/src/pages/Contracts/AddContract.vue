@@ -213,19 +213,40 @@ export default {
 		async addContract() {
 			this.$v.$touch();
 			if (!this.$v.$invalid) {
-				await this.$store.dispatch("contract/Add", {
-					clientId: this.contractClientId,
-					code: this.contractCode,
-					startDate: this.startDate,
-					finishDate: this.endDate,
-					amount: this.price,
-					currency: this.currency,
-					supply: this.supply,
-					facilityCount: this.facilityCount
-				});
+				if (!this.contractEditMode) {
+					await this.$store.dispatch("contract/Add", {
+						clientId: this.contractClientId,
+						code: this.contractCode,
+						startDate: this.startDate,
+						finishDate: this.endDate,
+						amount: this.price,
+						currency: this.currency,
+						supply: this.supply,
+						facilityCount: this.facilityCount
+					});
+				} else {
+					await this.$store.dispatch("contract/Update", {
+						id: this.contractId,
+						contract: {
+							clientId: this.contractClientId,
+							code: this.contractCode,
+							startDate: this.startDate,
+							finishDate: this.endDate,
+							amount: this.price,
+							currency: this.currency,
+							supply: this.supply,
+							facilityCount: this.facilityCount
+						}
+					});
+				}
 				if (this.contractResponse != null) {
 					if (this.contractResponse.data.success) {
-						this.showModal();
+						if (!this.contractEditMode) this.showModal();
+						else {
+							this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
+							await this.sleep(1000);
+							this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+						}
 					} else this.notify("error", "Hata", this.contractResponse.data.message);
 				} else this.notify("error", "Hata", this.contractErrorMessage);
 			}
@@ -282,6 +303,9 @@ export default {
 		onlyNumber($event) {
 			let keyCode = $event.keyCode ? $event.keyCode : $event.which;
 			if (keyCode < 48 || keyCode > 57) $event.preventDefault();
+		},
+		sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
 		}
 	}
 };
