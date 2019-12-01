@@ -8,6 +8,7 @@
 					<label class="mr-2">Müşteri:</label>
 					<b-select v-model="clientId">
 						<option value="" disabled>Müşteri seçiniz</option>
+						<option>Tümü</option>
 						<option v-for="(c, index) in clients" :value="c.id" :key="index">{{ c.title }}</option>
 					</b-select>
 				</b-form>
@@ -92,7 +93,8 @@ export default {
 	},
 	watch: {
 		clientId(id) {
-			this.getContractByClient(id);
+			if (id == "Tümü") this.getContracts();
+			else this.getContractByClient(id);
 		},
 		contracts(contracts) {
 			contracts.forEach(contract => {

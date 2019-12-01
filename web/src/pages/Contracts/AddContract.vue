@@ -37,7 +37,9 @@
 				</b-form-row>
 				<b-form-row>
 					<b-form-group label="Tutar" class="col-md-6">
-						<b-input v-model="price" @keypress="onlyNumber" @blur="$v.price.$touch()" placeholder="Tutar" type="text" class="form-control" />
+						<b-input-group :append="suffix">
+							<b-input v-model="price" @keypress="onlyNumber" @blur="$v.price.$touch()" placeholder="Tutar" type="text" class="form-control" />
+						</b-input-group>
 						<template v-if="$v.price.$error">
 							<small v-if="!$v.price.required || !$v.price.validPrice" class="form-text text-danger">Tutar boş geçilemez.</small>
 						</template>
@@ -73,7 +75,7 @@
 				<b-form-group label="Dosyalar">
 					<vue-dropzone id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" ref="dropzoneInstance" />
 				</b-form-group>
-				<b-btn class="btn-flat float-right" @click="addContract" variant="primary">{{ pageTitle }}</b-btn>
+				<b-btn class="btn-flat float-right" @click="addContract" variant="primary">{{ buttonTitle }}</b-btn>
 			</b-form>
 		</b-card>
 		<sweet-modal v-on:close="modalClosing" ref="successModal" icon="success" :hide-close-button="true">
@@ -111,9 +113,11 @@ export default {
 		SweetModal
 	},
 	data: () => ({
+		suffix: "₺",
 		contractEditMode: false,
 		isModalClosing: false,
 		pageTitle: "Sözleşme Ekle",
+		buttonTitle: "Sözleşme Ekle",
 		clients: [],
 		contractClientId: "",
 		contractCode: "",
@@ -153,16 +157,6 @@ export default {
 				</div>`
 		}
 	}),
-	computed: {
-		...mapGetters({
-			contractErrorMessage: "contract/errorMessage",
-			contractErrorCode: "contract/errorCode",
-			contractResponse: "contract/response",
-			clientErrorMessage: "client/errorMessage",
-			clientErrorCode: "client/errorCode",
-			clientResponse: "client/response"
-		})
-	},
 	validations: {
 		contractClientId: { required },
 		contractCode: { required },
@@ -183,12 +177,23 @@ export default {
 			}
 		}
 	},
+	computed: {
+		...mapGetters({
+			contractErrorMessage: "contract/errorMessage",
+			contractErrorCode: "contract/errorCode",
+			contractResponse: "contract/response",
+			clientErrorMessage: "client/errorMessage",
+			clientErrorCode: "client/errorCode",
+			clientResponse: "client/response"
+		})
+	},
 	async created() {
 		await this.getClients();
 		if (this.clientId) this.contractClientId = this.clientId;
 		if (this.contractId) {
 			this.contractEditMode = true;
 			this.pageTitle = "Sözleşme Düzenle";
+			this.buttonTitle = "Kaydet";
 			this.getContract(this.contractId);
 		}
 	},
@@ -198,7 +203,15 @@ export default {
 				to: new Date(newValue)
 			};
 			if (!newValue) this.endDate = "";
-			else this.endDate = new Date(newValue.getFullYear() + 2, newValue.getMonth(), newValue.getDate());
+			else {
+				this.endDate = new Date(newValue.getTime());
+				this.endDate.setFullYear(this.endDate.getFullYear() + 2);
+			}
+		},
+		currency(newValue) {
+			if (newValue == "TL") this.suffix = "₺";
+			else if (newValue == "Euro") this.suffix = "€";
+			else this.suffix = "$";
 		}
 	},
 	methods: {

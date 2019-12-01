@@ -27,42 +27,6 @@ export default {
 	metaInfo: {
 		title: "Müşteri Listesi"
 	},
-	computed: {
-		...mapGetters({
-			errorMessage: "client/errorMessage",
-			errorCode: "client/errorCode",
-			response: "client/response"
-		})
-	},
-	methods: {
-		async remove(row) {
-			var indexToDelete = this.clients
-				.map(x => {
-					return x.id;
-				})
-				.indexOf(row.id);
-			this.clients.splice(indexToDelete, 1);
-			await this.$store.dispatch("client/Delete", row.id);
-			if (this.response != null) {
-				if (this.response.status == 204) {
-					this.notify("success", "Başarılı", "Müşteri başarıyla silindi.");
-				} else this.notify("error", "Hata", this.response.data.message);
-			} else this.notify("error", "Hata", this.errorMessage);
-		},
-		edit(row) {
-			this.$router.push({ name: "addClients", params: { clientId: row.id } });
-		},
-		notify(type, title, text) {
-			this.$notify({
-				group: "app",
-				type: type,
-				title: title,
-				text: text,
-				ignoreDuplicates: true,
-				duration: 5000
-			});
-		}
-	},
 	data: () => ({
 		clients: [],
 		columns: ["currentCode", "title", "province", "district", "edit"],
@@ -96,6 +60,13 @@ export default {
 			}
 		}
 	}),
+	computed: {
+		...mapGetters({
+			errorMessage: "client/errorMessage",
+			errorCode: "client/errorCode",
+			response: "client/response"
+		})
+	},
 	async created() {
 		await this.$store.dispatch("client/Get");
 		if (this.response != null) {
@@ -103,6 +74,35 @@ export default {
 				this.clients = this.response.data.data;
 			} else this.notify("error", "Hata", this.response.data.message);
 		} else this.notify("error", "Hata", this.errorMessage);
+	},
+	methods: {
+		async remove(row) {
+			var indexToDelete = this.clients
+				.map(x => {
+					return x.id;
+				})
+				.indexOf(row.id);
+			this.clients.splice(indexToDelete, 1);
+			await this.$store.dispatch("client/Delete", row.id);
+			if (this.response != null) {
+				if (this.response.status == 204) {
+					this.notify("success", "Başarılı", "Müşteri başarıyla silindi.");
+				} else this.notify("error", "Hata", this.response.data.message);
+			} else this.notify("error", "Hata", this.errorMessage);
+		},
+		edit(row) {
+			this.$router.push({ name: "addClients", params: { clientId: row.id } });
+		},
+		notify(type, title, text) {
+			this.$notify({
+				group: "app",
+				type: type,
+				title: title,
+				text: text,
+				ignoreDuplicates: true,
+				duration: 5000
+			});
+		}
 	}
 };
 </script>

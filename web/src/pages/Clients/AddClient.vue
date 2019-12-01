@@ -148,6 +148,13 @@ export default {
 		title: "Müşteri Ekle"
 	},
 	props: ["clientId"],
+	components: {
+		FormWizard,
+		TabContent,
+		WizardStep,
+		MaskedInput,
+		SweetModal
+	},
 	data: () => ({
 		isModalClosing: false,
 		clientEditMode: false,
@@ -205,21 +212,6 @@ export default {
 			}
 		}
 	}),
-	created() {
-		if (this.clientId) {
-			this.clientEditMode = true;
-			this.pageTitle = "Müşteri Düzenle";
-			this.getClient(this.clientId);
-		}
-		this.getLocations();
-	},
-	components: {
-		FormWizard,
-		TabContent,
-		WizardStep,
-		MaskedInput,
-		SweetModal
-	},
 	validations: {
 		title: {
 			required,
@@ -264,6 +256,14 @@ export default {
 			clientContactErrorCode: "clientContact/errorCode",
 			clientContactResponse: "clientContact/response"
 		})
+	},
+	created() {
+		if (this.clientId) {
+			this.clientEditMode = true;
+			this.pageTitle = "Müşteri Düzenle";
+			this.getClient(this.clientId);
+		}
+		this.getLocations();
 	},
 	methods: {
 		async getClient(clientId) {

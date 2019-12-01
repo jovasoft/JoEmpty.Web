@@ -3,50 +3,50 @@
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> Tesis Ekle</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<b-card header="Tesis Bilgileri" header-tag="h6" class="mb-3">
-			<b-form @submit.prevent="addFacility" class="mb-1">
+			<b-form class="mb-1">
 				<b-form-row>
 					<b-form-group label="Müşteri" class="col-md-4">
-						<b-select v-model="client" @blur="$v.client.$touch()">
+						<b-select v-model="contractClientId" :disabled="facilityEditMode" @blur="$v.client.$touch()">
 							<option value="" disabled>Müşteri seçiniz</option>
-							<option v-for="(c, index) in clients" :value="index" :key="c"> {{ c.name }} </option>
+							<option v-for="(c, index) in clients" :value="c.id" :key="index"> {{ c.title }} </option>
 						</b-select>
-						<template v-if="$v.client.$error">
-							<small v-if="!$v.client.required" class="form-text text-danger">Müşteri boş geçilemez.</small>
+						<template v-if="$v.contractClientId.$error">
+							<small v-if="!$v.contractClientId.required" class="form-text text-danger">Müşteri boş geçilemez.</small>
 						</template>
 					</b-form-group>
 					<b-form-group label="Sözleşme" class="col-md-4">
-						<b-select v-model="contract" @blur="$v.contract.$touch()">
+						<b-select v-model="facilityContractId" :disabled="facilityEditMode" @blur="$v.contract.$touch()">
 							<option value="" disabled>Sözleşme seçiniz</option>
-							<option v-for="(c, index) in clientContracts" :value="index" :key="c"> {{ c.name }} </option>
+							<option v-for="(c, index) in clientContracts" :value="c.id" :key="index"> {{ c.code }} </option>
 						</b-select>
-						<template v-if="$v.contract.$error">
-							<small v-if="!$v.contract.required" class="form-text text-danger">Sözleşme boş geçilemez.</small>
+						<template v-if="$v.facilityContractId.$error">
+							<small v-if="!$v.facilityContractId.required" class="form-text text-danger">Sözleşme boş geçilemez.</small>
 						</template>
 					</b-form-group>
 					<b-form-group label="Tesis Kodu" class="col-md-4">
 						<b-input v-model="facilityCode" @blur="$v.facilityCode.$touch()" placeholder="Tesis Kodu" />
 						<template v-if="$v.facilityCode.$error">
-							<small v-if="!$v.facilityCode.required" class="form-text text-danger">Tesis kodu boş geçilemez.</small>
+							<small v-if="!$v.facilityCode.required || !$v.facilityCode.validFacilityCode" class="form-text text-danger">Tesis kodu boş geçilemez.</small>
 						</template>
 					</b-form-group>
 				</b-form-row>
 				<b-form-group label="Tesis Adı">
 					<b-input v-model="facilityName" @blur="$v.facilityName.$touch()" placeholder="Tesis Adı" />
 					<template v-if="$v.facilityName.$error">
-						<small v-if="!$v.facilityName.required" class="form-text text-danger">Tesis adı boş geçilemez.</small>
+						<small v-if="!$v.facilityName.required || !$v.facilityName.validFacilityName" class="form-text text-danger">Tesis adı boş geçilemez.</small>
 					</template>
 				</b-form-group>
 				<b-form-group label="Adres">
 					<b-input v-model="address" @blur="$v.address.$touch()" placeholder="Cadde/Mahalle" />
 					<template v-if="$v.address.$error">
-						<small v-if="!$v.address.required" class="form-text text-danger">Adres boş geçilemez.</small>
+						<small v-if="!$v.address.required || !$v.address.validAddress" class="form-text text-danger">Adres boş geçilemez.</small>
 					</template>
 				</b-form-group>
 				<b-form-row>
 					<b-form-group label="İl" class="col-md-4">
 						<b-select v-model="province" @blur="$v.province.$touch()">
 							<option value="" disabled>İl seçiniz</option>
-							<option v-for="(p, index) in provinces" :value="p" :key="index">{{ index }}</option>
+							<option v-for="(p, index) in provinces" :value="index" :key="index">{{ index }}</option>
 						</b-select>
 						<template v-if="$v.province.$error">
 							<small v-if="!$v.province.required" class="form-text text-danger">İl boş geçilemez.</small>
@@ -55,7 +55,7 @@
 					<b-form-group label="İlçe" class="col-md-4">
 						<b-select v-model="district" @blur="$v.district.$touch()" :disabled="!province">
 							<option value="" disabled>İlçe seçiniz</option>
-							<option v-for="(d, index) in province" :key="index">{{ d }}</option>
+							<option v-for="(d, index) in provinces[province]" :key="index">{{ d }}</option>
 						</b-select>
 						<template v-if="$v.district.$error">
 							<small v-if="!$v.district.required" class="form-text text-danger">İlçe boş geçilemez.</small>
@@ -64,7 +64,7 @@
 					<b-form-group label="Bölge" class="col-md-4">
 						<b-select v-model="area" @blur="$v.area.$touch()">
 							<option value="" disabled>Bölge seçiniz</option>
-							<option v-for="(a, index) in areas" :key="index" :value="a"> {{ a.name }} </option>
+							<option v-for="(a, index) in areas" :value="a.id" :key="index"> {{ a.name }} </option>
 						</b-select>
 						<template v-if="$v.area.$error">
 							<small v-if="!$v.area.required" class="form-text text-danger">Bölge boş geçilemez.</small>
@@ -97,21 +97,21 @@
 				</b-form-row>
 				<b-form-row>
 					<b-form-group label="Durak Sayısı" class="col-md-4">
-						<b-input v-model="stationCount" @blur="$v.stationCount.$touch()" @keypress="onlyNumber" placeholder="Durak Sayısı" />
+						<b-input v-model="stationCount" :disabled="!isElevator" @blur="$v.stationCount.$touch()" @keypress="onlyNumber" placeholder="Durak Sayısı" />
 						<template v-if="$v.stationCount.$error">
-							<small v-if="!$v.stationCount.required" class="form-text text-danger">Durak sayısı boş geçilemez.</small>
+							<small v-if="!$v.stationCount.required || (!$v.stationCount.validStationCount && isElevator)" class="form-text text-danger">Durak sayısı boş geçilemez.</small>
 						</template>
 					</b-form-group>
 					<b-form-group label="Hız (m/s)" class="col-md-4">
-						<b-input v-model="speed" @blur="$v.speed.$touch()" @keypress="onlyNumber" placeholder="Hız (m/s)" />
+						<b-input v-model="speed" :disabled="!isElevator" @blur="$v.speed.$touch()" @keypress="onlyNumber" placeholder="Hız (m/s)" />
 						<template v-if="$v.speed.$error">
-							<small v-if="!$v.speed.required" class="form-text text-danger">Hız boş geçilemez.</small>
+							<small v-if="!$v.speed.required || (!$v.speed.validSpeed && isElevator)" class="form-text text-danger">Hız boş geçilemez.</small>
 						</template>
 					</b-form-group>
 					<b-form-group label="Kapasite (kg)" class="col-md-4">
-						<b-input v-model="capacity" @blur="$v.capacity.$touch()" @keypress="onlyNumber" placeholder="Kapasite (kg)" />
+						<b-input v-model="capacity" :disabled="!isElevator" @blur="$v.capacity.$touch()" @keypress="onlyNumber" placeholder="Kapasite (kg)" />
 						<template v-if="$v.capacity.$error">
-							<small v-if="!$v.capacity.required" class="form-text text-danger">Kapasite boş geçilemez.</small>
+							<small v-if="!$v.capacity.required || (!$v.capacity.validCapacity && isElevator)" class="form-text text-danger">Kapasite boş geçilemez.</small>
 						</template>
 					</b-form-group>
 				</b-form-row>
@@ -119,34 +119,40 @@
 					<b-form-group label="Bakım Durumu" class="col-md-3">
 						<b-select v-model="maintenanceStatus" @blur="$v.maintenanceStatus.$touch()">
 							<option value="" disabled>Bakım durumunu seçiniz</option>
-							<option>Aktif</option>
-							<option>Pasif</option>
+							<option value="Active">Aktif</option>
+							<option value="Passive">Pasif</option>
 						</b-select>
 						<template v-if="$v.maintenanceStatus.$error">
 							<small v-if="!$v.maintenanceStatus.required" class="form-text text-danger">Bakım durumu boş geçilemez.</small>
 						</template>
 					</b-form-group>
 					<b-form-group label="Eski Bakım Ücreti" class="col-md-3">
-						<masked-input v-model="oldMaintenanceFee" @blur="$v.oldMaintenanceFee.$touch()" placeholder="Eski Bakım Ücreti" type="text" class="form-control" :mask="priceMask" />
+						<b-input-group append="₺">
+							<b-input v-model="oldMaintenanceFee" @keypress="onlyNumber" @blur="$v.oldMaintenanceFee.$touch()" placeholder="Eski Bakım Ücreti" />
+						</b-input-group>
 						<template v-if="$v.oldMaintenanceFee.$error">
-							<small v-if="!$v.oldMaintenanceFee.required" class="form-text text-danger">Eski bakım ücreti boş geçilemez.</small>
+							<small v-if="!$v.oldMaintenanceFee.required || !$v.oldMaintenanceFee.validOldMaintenanceFee" class="form-text text-danger">Eski bakım ücreti boş geçilemez.</small>
 						</template>
 					</b-form-group>
 					<b-form-group label="Güncel Bakım Ücreti" class="col-md-3">
-						<masked-input v-model="currentMaintenanceFee" @blur="$v.currentMaintenanceFee.$touch()" placeholder="Güncel Bakım Ücreti" type="text" class="form-control" :mask="priceMask" />
+						<b-input-group append="₺">
+							<b-input v-model="currentMaintenanceFee" @keypress="onlyNumber" @blur="$v.currentMaintenanceFee.$touch()" placeholder="Güncel Bakım Ücreti" />
+						</b-input-group>
 						<template v-if="$v.currentMaintenanceFee.$error">
-							<small v-if="!$v.currentMaintenanceFee.required" class="form-text text-danger">Güncel bakım ücreti boş geçilemez.</small>
+							<small v-if="!$v.currentMaintenanceFee.required || !$v.currentMaintenanceFee.validCurrentMaintenanceFee" class="form-text text-danger">Güncel bakım ücreti boş geçilemez.</small>
 						</template>
 					</b-form-group>
 					<b-form-group label="Arıza Ücreti" class="col-md-3">
-						<masked-input v-model="breakdownFee" @blur="$v.breakdownFee.$touch()" placeholder="Arıza Ücreti" type="text" class="form-control" :mask="priceMask" />
+						<b-input-group append="₺">
+							<b-input v-model="breakdownFee" @blur="$v.breakdownFee.$touch()" @keypress="onlyNumber" placeholder="Arıza Ücreti" />
+						</b-input-group>
 						<template v-if="$v.breakdownFee.$error">
-							<small v-if="!$v.breakdownFee.required" class="form-text text-danger">Arıza ücreti boş geçilemez.</small>
+							<small v-if="!$v.breakdownFee.required || !$v.breakdownFee.validBreakdownFee" class="form-text text-danger">Arıza ücreti boş geçilemez.</small>
 						</template>
 					</b-form-group>
 				</b-form-row>
 				<b-form-group>
-					<b-btn class="btn-flat float-right" type="submit" variant="primary">Sözleşme Ekle</b-btn>
+					<b-btn class="btn-flat float-right" @click="addFacility" variant="primary">Sözleşme Ekle</b-btn>
 					<b-btn class="btn-flat float-right mr-2" @click="clearForm" variant="secondary">Temizle</b-btn>
 				</b-form-group>
 			</b-form>
@@ -159,9 +165,8 @@
 <script>
 import Datepicker from "vuejs-datepicker";
 import { tr } from "vuejs-datepicker/dist/locale";
-import MaskedInput from "vue-text-mask";
-import * as textMaskAddons from "text-mask-addons/dist/textMaskAddons";
-import { required } from "vuelidate/lib/validators/";
+import { required, requiredIf } from "vuelidate/lib/validators/";
+import { mapGetters } from "vuex";
 
 export default {
 	name: "facilities-add",
@@ -169,39 +174,167 @@ export default {
 		title: "Tesis Ekle"
 	},
 	components: {
-		Datepicker,
-		MaskedInput
+		Datepicker
 	},
+	data: () => ({
+		isElevator: true,
+		facilityEditMode: false,
+		isModalClosing: false,
+		pageTitle: "Tesis Ekle",
+		clients: [],
+		clientContracts: [],
+		areas: [],
+		provinces: [],
+		contractClientId: "",
+		facilityContractId: "",
+		facilityCode: "",
+		facilityName: "",
+		address: "",
+		province: "",
+		district: "",
+		area: "",
+		facilityType: "",
+		brand: "",
+		warrantyDate: "",
+		stationCount: "",
+		speed: "",
+		capacity: "",
+		maintenanceStatus: "",
+		oldMaintenanceFee: "",
+		currentMaintenanceFee: "",
+		breakdownFee: "",
+		tr: tr
+	}),
 	validations: {
-		client: { required },
-		contract: { required },
-		facilityCode: { required },
-		facilityName: { required },
-		address: { required },
+		contractClientId: { required },
+		facilityContractId: { required },
+		facilityCode: {
+			required,
+			validFacilityCode: facilityCode => {
+				return /^(?!\s*$).+/.test(facilityCode);
+			}
+		},
+		facilityName: {
+			required,
+			validFacilityName: facilityName => {
+				return /^(?!\s*$).+/.test(facilityName);
+			}
+		},
+		address: {
+			required,
+			validAddres: address => {
+				return /^(?!\s*$).+/.test(address);
+			}
+		},
 		province: { required },
 		district: { required },
 		area: { required },
 		facilityType: { required },
 		warrantyDate: { required },
-		stationCount: { required },
-		speed: { required },
-		capacity: { required },
-		maintenanceStatus: { required },
-		oldMaintenanceFee: { required },
-		currentMaintenanceFee: { required },
-		breakdownFee: { required }
-	},
-	methods: {
-		addFacility: async function() {
-			this.$v.$touch();
-		},
-		onlyNumber: function($event) {
-			let keyCode = $event.keyCode;
-			if (keyCode < 48 || keyCode > 57) {
-				$event.preventDefault();
+		stationCount: {
+			required: requiredIf(function() {
+				return this.isElevator;
+			}),
+			validStationCount: stationCount => {
+				return /^\d+$/.test(stationCount);
 			}
 		},
-		clearForm: function() {
+		speed: {
+			required: requiredIf(function() {
+				return this.isElevator;
+			}),
+			validSpeed: speed => {
+				return /^\d+$/.test(speed);
+			}
+		},
+		capacity: {
+			required: requiredIf(function() {
+				return this.isElevator;
+			}),
+			validCapacity: capacity => {
+				return /^\d+$/.test(capacity);
+			}
+		},
+		maintenanceStatus: { required },
+		oldMaintenanceFee: {
+			required,
+			validOldMaintenanceFee: oldMaintenanceFee => {
+				return /^\d+$/.test(oldMaintenanceFee);
+			}
+		},
+		currentMaintenanceFee: {
+			required,
+			validCurrentMaintenanceFee: currentMaintenanceFee => {
+				return /^\d+$/.test(currentMaintenanceFee);
+			}
+		},
+		breakdownFee: {
+			required,
+			validBreakdownFee: breakdownFee => {
+				return /^\d+$/.test(breakdownFee);
+			}
+		}
+	},
+	computed: {
+		...mapGetters({
+			clientErrorMessage: "client/errorMessage",
+			clientErrorCode: "client/errorCode",
+			clientResponse: "client/response",
+			contractErrorMessage: "contract/errorMessage",
+			contractErrorCode: "contract/errorCode",
+			contractResponse: "contract/response",
+			facilityErrorMessage: "facility/errorMessage",
+			facilityErrorCode: "facility/errorCode",
+			facilityResponse: "facility/response"
+		})
+	},
+	created() {
+		this.getLocations();
+		this.getClients();
+	},
+	watch: {
+		contractClientId(clientId) {
+			this.getContractsByClient(clientId);
+		},
+		facilityType(type) {
+			if (type == "MW") this.isElevator = false;
+			else if (type == "ESC") this.isElevator = false;
+			else if (type == "MR") this.isElevator = true;
+			else if (type == "MRL") this.isElevator = true;
+			else this.isElevator = true;
+		}
+	},
+	methods: {
+		async addFacility() {
+			this.$v.$touch();
+		},
+		async getClients() {
+			await this.$store.dispatch("client/Get");
+			if (this.clientResponse != null) {
+				if (this.clientResponse.data.success) this.clients = this.clientResponse.data.data;
+				else this.notify("error", "Hata", this.clientResponse.data.message);
+			} else this.notify("error", "Hata", this.clientErrorMessage);
+		},
+		async getContractsByClient(clientId) {
+			await this.$store.dispatch("contract/GetContractsByClient", clientId);
+			if (this.contractResponse != null) {
+				if (this.contractResponse.data.success) this.clientContracts = this.contractResponse.data.data;
+				else this.notify("error", "Hata", this.contractResponse.data.message);
+			} else this.notify("error", "Hata", this.contractErrorMessage);
+		},
+		getLocations() {
+			const req = new XMLHttpRequest();
+			req.open("GET", `${this.publicUrl}json/locations.json`);
+			req.onload = () => {
+				this.provinces = JSON.parse(req.response);
+			};
+			req.send();
+		},
+		onlyNumber($event) {
+			let keyCode = $event.keyCode;
+			if (keyCode < 48 || keyCode > 57) $event.preventDefault();
+		},
+		clearForm() {
 			this.$v.$reset();
 			this.client = "";
 			this.contract = "";
@@ -221,48 +354,16 @@ export default {
 			this.oldMaintenanceFee = "";
 			this.currentMaintenanceFee = "";
 			this.breakdownFee = "";
-		}
-	},
-	data: () => ({
-		clients: [],
-		clientContracts: [],
-		areas: [],
-		provinces: [],
-		client: "",
-		contract: "",
-		facilityCode: "",
-		facilityName: "",
-		address: "",
-		province: "",
-		district: "",
-		area: "",
-		facilityType: "",
-		brand: "",
-		warrantyDate: "",
-		stationCount: "",
-		speed: "",
-		capacity: "",
-		maintenanceStatus: "",
-		oldMaintenanceFee: "",
-		currentMaintenanceFee: "",
-		breakdownFee: "",
-		tr: tr,
-		priceMask: textMaskAddons.createNumberMask({
-			prefix: "",
-			suffix: " ₺"
-		})
-	}),
-	created() {
-		const req = new XMLHttpRequest();
-		req.open("GET", `${this.publicUrl}json/locations.json`);
-		req.onload = () => {
-			this.provinces = JSON.parse(req.response);
-		};
-		req.send();
-	},
-	watch: {
-		province() {
-			this.district = "";
+		},
+		notify(type, title, text) {
+			this.$notify({
+				group: "app",
+				type: type,
+				title: title,
+				text: text,
+				ignoreDuplicates: true,
+				duration: 5000
+			});
 		}
 	}
 };
