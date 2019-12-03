@@ -51,10 +51,23 @@ export const actions = {
 		}
 	},
 
-	async GetByContractFacilities({ commit }, contractId) {
+	async GeyFacilitiesByContract({ commit }, contractId) {
 		try {
 			commit("changeStatus", "loading");
-			const response = await FacilityService.GetByContractFacilities(contractId);
+			const response = await FacilityService.GeyFacilitiesByContract(contractId);
+			commit("success", response);
+		} catch (error) {
+			commit("error", {
+				errorCode: error.errorCode,
+				errorMessage: error.message
+			});
+		}
+	},
+
+	async GetFacilitiesByClient({ commit }, clientId) {
+		try {
+			commit("changeStatus", "loading");
+			const response = await FacilityService.GetFacilitiesByClient(clientId);
 			commit("success", response);
 		} catch (error) {
 			commit("error", {
