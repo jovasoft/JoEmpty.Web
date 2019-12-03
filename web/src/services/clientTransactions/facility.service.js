@@ -57,7 +57,8 @@ const FacilityService = {
 
 	Update: async function(id, facility) {
 		try {
-			await ApiService.put(ApiService.baseAddress + "facility/" + id, facility);
+			const response = await ApiService.put(ApiService.baseAddress + "facility/" + id, facility);
+			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);
 		}

@@ -32,8 +32,8 @@
 					<template slot="link-text">
 						Tesisler
 					</template>
-					<sidenav-router-link to="/client-transactions/facilities/list" :exact="true">Tesis Listesi</sidenav-router-link>
-					<sidenav-router-link to="/client-transactions/facilities/add" :exact="true">Tesis Ekle</sidenav-router-link>
+					<sidenav-router-link to="/client-transactions/facilities/list">Tesis Listesi</sidenav-router-link>
+					<sidenav-router-link to="/client-transactions/facilities/add">Tesis Ekle</sidenav-router-link>
 				</sidenav-menu>
 			</sidenav-menu>
 			<sidenav-menu icon="ion ion-md-calculator" :active="isMenuActive('/accounting')" :open="isMenuOpen('/accounting')">

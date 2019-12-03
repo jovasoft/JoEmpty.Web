@@ -93,7 +93,7 @@ export const actions = {
 	async Update({ commit }, facility) {
 		try {
 			commit("changeStatus", "loading");
-			const response = await FacilityService.Update(facility);
+			const response = await FacilityService.Update(facility.id, facility.facility);
 			commit("success", response);
 		} catch (error) {
 			commit("error", {

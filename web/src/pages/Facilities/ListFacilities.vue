@@ -14,7 +14,7 @@
 				</b-form>
 				<b-form inline class="mr-3">
 					<label class="mr-2">Sözleşme:</label>
-					<b-select v-model="facilityContractId">
+					<b-select :disabled="!isClientSelected" v-model="facilityContractId">
 						<option value="" disabled>Sözleşme seçiniz</option>
 						<option>Tümü</option>
 						<option v-for="(c, index) in contracts" :value="c.id" :key="index">{{ c.code }}</option>
@@ -47,12 +47,13 @@ export default {
 	},
 	props: ["clientId", "contractId"],
 	data: () => ({
+		isClientSelected: false,
 		contractClientId: "",
 		facilityContractId: "",
 		clients: [],
 		contracts: [],
 		facilities: [],
-		columns: ["code", "name", "province", "district", "area", "type", "warrantyFinishDate", "edit"],
+		columns: ["code", "name", "province", "district", "area", "type", "maintenanceStatus", "formattedWarrantyFinishDate", "edit"],
 		options: {
 			filterable: true,
 			perPage: 10,
@@ -66,7 +67,8 @@ export default {
 				district: "İlçe",
 				Area: "Bölge",
 				type: "Tesis Tipi",
-				warrantyFinishDate: "Garanti Bitiş Tarihi",
+				maintenanceStatus: "Bakım Durumu",
+				formattedWarrantyFinishDate: "Garanti Bitiş Tarihi",
 				edit: "Düzenle"
 			},
 			sortIcon: {
@@ -102,19 +104,40 @@ export default {
 	},
 	async created() {
 		await this.getClients();
+		if (this.clientId) this.contractClientId = this.clientId;
 	},
 	watch: {
 		contractClientId(id) {
+			this.facilities = [];
+			this.facilityContractId = "";
+			if (id != "Müşteri seçiniz" && id != "") this.isClientSelected = true;
 			if (id == "Tümü") this.getContracts();
 			else this.getContractsByClient(id);
 		},
 		facilityContractId(id) {
-			if (id == "Tümü" && this.contractClientId == "Tümü") this.getFacilities();
-			else if (id == "Tümü" && this.contractClientId != "Tümü") this.getFacilitiesByClient(this.contractClientId);
-			else this.getFacilitiesByContract(id);
+			if (id != "") {
+				if (id == "Tümü" && this.contractClientId == "Tümü") this.getFacilities();
+				else if (id == "Tümü" && this.contractClientId != "Tümü") this.getFacilitiesByClient(this.contractClientId);
+				else this.getFacilitiesByContract(id);
+			}
+		},
+		facilities(facilities) {
+			facilities.forEach(facility => {
+				if (facility.type == 1) facility.type = "MR";
+				else if (facility.type == 2) facility.type = "MRL";
+				else if (facility.type == 3) facility.type = "Hydraulic";
+				else if (facility.type == 4) facility.type = "DumbWaiter";
+				else if (facility.type == 5) facility.type = "MW";
+				else facility.type = "ESC";
+				if (facility.maintenanceStatus == 1) facility.maintenanceStatus = "Aktif";
+				else facility.maintenanceStatus = "Pasif";
+			});
 		}
 	},
 	methods: {
+		sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
+		},
 		async getClients() {
 			await this.$store.dispatch("client/Get");
 			if (this.clientResponse != null) {
@@ -138,8 +161,10 @@ export default {
 		async getContractsByClient(clientId) {
 			await this.$store.dispatch("contract/GetContractsByClient", clientId);
 			if (this.contractResponse != null) {
-				if (this.contractResponse.data.success) this.contracts = this.contractResponse.data.data;
-				else {
+				if (this.contractResponse.data.success) {
+					this.contracts = this.contractResponse.data.data;
+					if (this.contractId) this.facilityContractId = this.contractId;
+				} else {
 					this.notify("error", "Hata", this.contractResponse.data.message);
 					this.contracts = [];
 				}

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> Tesis Ekle</h4>
+		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> {{ pageTitle }}</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<b-card header="Tesis Bilgileri" header-tag="h6" class="mb-3">
 			<b-form class="mb-1">
@@ -76,11 +76,11 @@
 					<b-form-group label="Tesis Tipi" class="col-md-4">
 						<b-select v-model="facilityType" @blur="$v.facilityType.$touch()">
 							<option value="" disabled>Tesis tipi seçiniz</option>
-							<option>MR</option>
-							<option>MRL</option>
-							<option>Hydraulic</option>
-							<option>MW</option>
-							<option>ESC</option>
+							<option value="MR">MR</option>
+							<option value="MRL">MRL</option>
+							<option value="Hydraulic">Hydraulic</option>
+							<option value="MW">MW</option>
+							<option value="ESC">ESC</option>
 						</b-select>
 						<template v-if="$v.facilityType.$error">
 							<small v-if="!$v.facilityType.required" class="form-text text-danger">Tesis tipi boş geçilemez.</small>
@@ -300,9 +300,12 @@ export default {
 	async created() {
 		this.getLocations();
 		await this.getClients();
-		if (this.clientId && this.contractId) {
-			this.contractClientId = this.clientId;
-			this.facilityContractId = this.contractId;
+		if (this.clientId) this.contractClientId = this.clientId;
+		if (this.facilityId) {
+			this.facilityEditMode = true;
+			this.pageTitle = "Tesis Düzenle";
+			this.buttonTitle = "Kaydet";
+			this.getFacility(this.facilityId);
 		}
 	},
 	watch: {
@@ -321,33 +324,59 @@ export default {
 		async addFacility() {
 			this.$v.$touch();
 			if (!this.$v.$invalid) {
-				await this.$store.dispatch("facility/Add", {
-					clientId: this.contractClientId,
-					contractId: this.facilityContractId,
-					code: this.facilityCode,
-					name: this.facilityName,
-					address: this.address,
-					province: this.province,
-					district: this.district,
-					areaId: this.areaId,
-					type: this.facilityType,
-					brand: this.brand,
-					warrantyFinishDate: this.warrantyDate,
-					station: this.stationCount,
-					speed: this.speed,
-					capacity: this.capacity,
-					maintenanceStatus: this.maintenanceStatus,
-					oldMaintenanceFee: this.oldMaintenanceFee,
-					currentMaintenanceFee: this.currentMaintenanceFee,
-					breakdownFee: this.breakdownFee
-				});
+				if (!this.facilityEditMode) {
+					await this.$store.dispatch("facility/Add", {
+						clientId: this.contractClientId,
+						contractId: this.facilityContractId,
+						code: this.facilityCode,
+						name: this.facilityName,
+						address: this.address,
+						province: this.province,
+						district: this.district,
+						areaId: this.areaId,
+						type: this.facilityType,
+						brand: this.brand,
+						warrantyFinishDate: this.warrantyDate,
+						station: this.stationCount,
+						speed: this.speed,
+						capacity: this.capacity,
+						maintenanceStatus: this.maintenanceStatus,
+						oldMaintenanceFee: this.oldMaintenanceFee,
+						currentMaintenanceFee: this.currentMaintenanceFee,
+						breakdownFee: this.breakdownFee
+					});
+				} else {
+					await this.$store.dispatch("facility/Update", {
+						id: this.facilityId,
+						facility: {
+							clientId: this.contractClientId,
+							contractId: this.facilityContractId,
+							code: this.facilityCode,
+							name: this.facilityName,
+							address: this.address,
+							province: this.province,
+							district: this.district,
+							areaId: this.areaId,
+							type: this.facilityType,
+							brand: this.brand,
+							warrantyFinishDate: this.warrantyDate,
+							station: this.stationCount,
+							speed: this.speed,
+							capacity: this.capacity,
+							maintenanceStatus: this.maintenanceStatus,
+							oldMaintenanceFee: this.oldMaintenanceFee,
+							currentMaintenanceFee: this.currentMaintenanceFee,
+							breakdownFee: this.breakdownFee
+						}
+					});
+				}
 				if (this.facilityResponse != null) {
 					if (this.facilityResponse.data.success) {
-						if (!this.contractEditMode) this.showModal();
+						if (!this.facilityEditMode) this.showModal();
 						else {
 							this.notify("success", "Başarılı", "Tesis başarıyla güncellendi.");
 							await this.sleep(1000);
-							this.$router.push({ name: "listFacilities", params: { contractsClientId: this.contractClientId, facilityContractId: this.facilityContractId } });
+							this.$router.push({ name: "listFacilities", params: { clientId: this.contractClientId, contractId: this.facilityContractId } });
 						}
 					} else this.notify("error", "Hata", this.facilityResponse.data.message);
 				} else this.notify("error", "Hata", this.facilityErrorMessage);
@@ -363,8 +392,10 @@ export default {
 		async getContractsByClient(clientId) {
 			await this.$store.dispatch("contract/GetContractsByClient", clientId);
 			if (this.contractResponse != null) {
-				if (this.contractResponse.data.success) this.clientContracts = this.contractResponse.data.data;
-				else {
+				if (this.contractResponse.data.success) {
+					this.clientContracts = this.contractResponse.data.data;
+					if (this.contractId) this.facilityContractId = this.contractId;
+				} else {
 					this.notify("error", "Hata", this.contractResponse.data.message);
 					this.clientContracts = [];
 				}
@@ -372,6 +403,42 @@ export default {
 				if (this.contractErrorCode != 404) this.notify("error", "Hata", this.contractErrorMessage);
 				this.clientContracts = [];
 			}
+		},
+		async getFacility(facilityId) {
+			await this.$store.dispatch("facility/GetOne", facilityId);
+			if (this.facilityResponse != null) {
+				if (this.facilityResponse.data.success) {
+					this.fillForms(this.facilityResponse.data.data);
+				} else this.notify("error", "Hata", this.facilityResponse.data.message);
+			} else this.notify("error", "Hata", this.facilityErrorMessage);
+		},
+		fillForms(facility) {
+			this.contractClientId = facility.clientId;
+			this.facilityContractId = facility.contractId;
+			this.facilityCode = facility.code;
+			this.facilityName = facility.name;
+			this.address = facility.address;
+			this.province = facility.province;
+			this.district = facility.district;
+			this.areaId = facility.areaId;
+			if (facility.type == 1) this.facilityType = "MR";
+			else if (facility.type == 2) this.facilityType = "MRL";
+			else if (facility.type == 3) this.facilityType = "Hydraulic";
+			else if (facility.type == 4) this.facilityType = "DumbWaiter";
+			else if (facility.type == 5) this.facilityType = "MW";
+			else this.facilityType = "ESC";
+			this.brand = facility.brand;
+			this.warrantyDate = facility.warrantyFinishDate;
+			if (facility.type == 1 || facility.type == 2 || facility.type == 3 || facility.type == 4) {
+				this.stationCount = facility.station;
+				this.speed = facility.speed;
+				this.capacity = facility.capacity;
+			}
+			if (facility.maintenanceStatus == 1) this.maintenanceStatus = "Active";
+			else this.maintenanceStatus = "Passive";
+			this.oldMaintenanceFee = facility.oldMaintenanceFee;
+			this.currentMaintenanceFee = facility.currentMaintenanceFee;
+			this.breakdownFee = facility.breakdownFee;
 		},
 		getLocations() {
 			const req = new XMLHttpRequest();
@@ -421,7 +488,7 @@ export default {
 		},
 		modalClosing() {
 			if (!this.isModalClosing) {
-				this.$router.push({ name: "listFacilities", params: { contractsClientId: this.contractClientId, facilityContractId: this.facilityContractId } });
+				this.$router.push({ name: "listFacilities", params: { clientId: this.contractClientId, contractId: this.facilityContractId } });
 			}
 		},
 		refreshPage() {
