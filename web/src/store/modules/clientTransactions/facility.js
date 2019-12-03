@@ -64,6 +64,19 @@ export const actions = {
 		}
 	},
 
+	async GetFacilitiesByClient({ commit }, clientId) {
+		try {
+			commit("changeStatus", "loading");
+			const response = await FacilityService.GetFacilitiesByClient(clientId);
+			commit("success", response);
+		} catch (error) {
+			commit("error", {
+				errorCode: error.errorCode,
+				errorMessage: error.message
+			});
+		}
+	},
+
 	async Add({ commit }, facility) {
 		try {
 			commit("changeStatus", "loading");

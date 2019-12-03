@@ -322,6 +322,7 @@ export default {
 			this.$v.$touch();
 			if (!this.$v.$invalid) {
 				await this.$store.dispatch("facility/Add", {
+					clientId: this.contractClientId,
 					contractId: this.facilityContractId,
 					code: this.facilityCode,
 					name: this.facilityName,

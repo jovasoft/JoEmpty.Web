@@ -109,7 +109,8 @@ export default {
 			else this.getContractsByClient(id);
 		},
 		facilityContractId(id) {
-			if (id == "Tümü") this.getFacilities();
+			if (id == "Tümü" && this.contractClientId == "Tümü") this.getFacilities();
+			else if (id == "Tümü" && this.contractClientId != "Tümü") this.getFacilitiesByClient(this.contractClientId);
 			else this.getFacilitiesByContract(id);
 		}
 	},
@@ -162,6 +163,19 @@ export default {
 		},
 		async getFacilitiesByContract(id) {
 			await this.$store.dispatch("facility/GetFacilitiesByContract", id);
+			if (this.facilityResponse != null) {
+				if (this.facilityResponse.data.success) this.facilities = this.facilityResponse.data.data;
+				else {
+					this.notify("error", "Hata", this.facilityResponse.data.message);
+					this.facilities = [];
+				}
+			} else {
+				if (this.facilityErrorCode != 404) this.notify("error", "Hata", this.facilityErrorMessage);
+				this.facilities = [];
+			}
+		},
+		async getFacilitiesByClient(id) {
+			await this.$store.dispatch("facility/GetFacilitiesByClient", id);
 			if (this.facilityResponse != null) {
 				if (this.facilityResponse.data.success) this.facilities = this.facilityResponse.data.data;
 				else {
