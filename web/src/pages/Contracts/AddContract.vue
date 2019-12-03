@@ -3,7 +3,7 @@
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Sözleşmeler /</span> {{ pageTitle }}</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<b-card header="Sözleşme Bilgileri" header-tag="h6" class="mb-3">
-			<b-form class="mb-1">
+			<b-form class="mb-1" @submit.prevent="addContract">
 				<b-form-row>
 					<b-form-group label="Müşteri" class="col-md-6">
 						<b-select v-model="contractClientId" :disabled="contractEditMode" @blur="$v.contractClientId.$touch()">
@@ -75,7 +75,7 @@
 				<b-form-group label="Dosyalar">
 					<vue-dropzone id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" ref="dropzoneInstance" />
 				</b-form-group>
-				<b-btn class="btn-flat float-right" @click="addContract" variant="primary">{{ buttonTitle }}</b-btn>
+				<b-btn class="btn-flat float-right" @click="addContract" type="submit" variant="primary">{{ buttonTitle }}</b-btn>
 			</b-form>
 		</b-card>
 		<sweet-modal v-on:close="modalClosing" ref="successModal" icon="success" :hide-close-button="true">
@@ -318,7 +318,7 @@ export default {
 		},
 		onlyNumber($event) {
 			let keyCode = $event.keyCode ? $event.keyCode : $event.which;
-			if (keyCode < 48 || keyCode > 57) $event.preventDefault();
+			if ((keyCode < 48 || keyCode > 57) && keyCode !== 13) $event.preventDefault();
 		},
 		sleep(ms) {
 			return new Promise(resolve => setTimeout(resolve, ms));

@@ -2,7 +2,7 @@
 	<div>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> Tesis Listesi</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
-		<v-client-table :data="facilities" :options="options" :columns="columns">
+		<v-client-table ref="facilityTable" :data="facilities" v-on:filter="filterChange" :options="options" :columns="columns">
 			<template slot="beforeFilter">
 				<b-form inline class="mr-3">
 					<label class="mr-2">Müşteri:</label>
@@ -65,7 +65,7 @@ export default {
 				name: "Tesis Adı",
 				province: "İl",
 				district: "İlçe",
-				Area: "Bölge",
+				area: "Bölge",
 				type: "Tesis Tipi",
 				maintenanceStatus: "Bakım Durumu",
 				formattedWarrantyFinishDate: "Garanti Bitiş Tarihi",
@@ -125,7 +125,7 @@ export default {
 			facilities.forEach(facility => {
 				if (facility.type == 1) facility.type = "MR";
 				else if (facility.type == 2) facility.type = "MRL";
-				else if (facility.type == 3) facility.type = "Hydraulic";
+				else if (facility.type == 3) facility.type = "Hidrolik";
 				else if (facility.type == 4) facility.type = "DumbWaiter";
 				else if (facility.type == 5) facility.type = "MW";
 				else facility.type = "ESC";
@@ -135,6 +135,16 @@ export default {
 		}
 	},
 	methods: {
+		turkishToUpperCase(string) {
+			var letters = { i: "İ", ş: "Ş", ğ: "Ğ", ü: "Ü", ö: "Ö", ç: "Ç", ı: "I" };
+			string = string.replace(/(([iışğüçö]))/g, function(letter) {
+				return letters[letter];
+			});
+			return string.toUpperCase();
+		},
+		filterChange(query) {
+			if (query != "") this.$refs.facilityTable.setFilter(this.turkishToUpperCase(query[0]) + query.slice(1));
+		},
 		sleep(ms) {
 			return new Promise(resolve => setTimeout(resolve, ms));
 		},

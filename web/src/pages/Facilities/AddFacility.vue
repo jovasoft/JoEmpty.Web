@@ -3,7 +3,7 @@
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> {{ pageTitle }}</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<b-card header="Tesis Bilgileri" header-tag="h6" class="mb-3">
-			<b-form class="mb-1">
+			<b-form class="mb-1" @submit.prevent="addFacility">
 				<b-form-row>
 					<b-form-group label="Müşteri" class="col-md-4">
 						<b-select v-model="contractClientId" :disabled="facilityEditMode" @blur="$v.client.$touch()">
@@ -62,13 +62,13 @@
 						</template>
 					</b-form-group>
 					<b-form-group label="Bölge" class="col-md-4">
-						<b-select v-model="area" @blur="$v.area.$touch()">
+						<b-select v-model="areaId" @blur="$v.areaId.$touch()">
 							<option value="" disabled>Bölge seçiniz</option>
 							<option value="0cdf0c96-3269-40e7-a92e-3b33994c93be">Bölge</option>
 							<option v-for="(a, index) in areas" :value="a.id" :key="index"> {{ a.name }} </option>
 						</b-select>
-						<template v-if="$v.area.$error">
-							<small v-if="!$v.area.required" class="form-text text-danger">Bölge boş geçilemez.</small>
+						<template v-if="$v.areaId.$error">
+							<small v-if="!$v.areaId.required" class="form-text text-danger">Bölge boş geçilemez.</small>
 						</template>
 					</b-form-group>
 				</b-form-row>
@@ -78,7 +78,7 @@
 							<option value="" disabled>Tesis tipi seçiniz</option>
 							<option value="MR">MR</option>
 							<option value="MRL">MRL</option>
-							<option value="Hydraulic">Hydraulic</option>
+							<option value="Hydraulic">Hidrolik</option>
 							<option value="MW">MW</option>
 							<option value="ESC">ESC</option>
 						</b-select>
@@ -153,7 +153,7 @@
 					</b-form-group>
 				</b-form-row>
 				<b-form-group>
-					<b-btn class="btn-flat float-right" @click="addFacility" variant="primary">{{ buttonTitle }}</b-btn>
+					<b-btn class="btn-flat float-right" type="submit" variant="primary">{{ buttonTitle }}</b-btn>
 					<b-btn class="btn-flat float-right mr-2" @click="clearForm" variant="secondary">Temizle</b-btn>
 				</b-form-group>
 			</b-form>
@@ -201,7 +201,7 @@ export default {
 		address: "",
 		province: "",
 		district: "",
-		area: "",
+		areaId: "",
 		facilityType: "",
 		brand: "",
 		warrantyDate: "",
@@ -237,7 +237,7 @@ export default {
 		},
 		province: { required },
 		district: { required },
-		area: { required },
+		areaId: { required },
 		facilityType: { required },
 		warrantyDate: { required },
 		stationCount: {
@@ -372,7 +372,7 @@ export default {
 				}
 				if (this.facilityResponse != null) {
 					if (this.facilityResponse.data.success) {
-						if (!this.facilityEditMode) this.notify("success", "Başarılı", this.facilityCode + "numaralı tesis başarıyla eklendi.");
+						if (!this.facilityEditMode) this.notify("success", "Başarılı", this.facilityCode + " numaralı tesis başarıyla eklendi.");
 						else {
 							this.notify("success", "Başarılı", "Tesis başarıyla güncellendi.");
 							await this.sleep(1000);
@@ -450,7 +450,7 @@ export default {
 		},
 		onlyNumber($event) {
 			let keyCode = $event.keyCode;
-			if (keyCode < 48 || keyCode > 57) $event.preventDefault();
+			if ((keyCode < 48 || keyCode > 57) && keyCode !== 13) $event.preventDefault();
 		},
 		clearForm() {
 			this.$v.$reset();
@@ -461,7 +461,7 @@ export default {
 			this.address = "";
 			this.province = "";
 			this.district = "";
-			this.area = "";
+			this.areaId = "";
 			this.facilityType = "";
 			this.brand = "";
 			this.warrantyDate = "";

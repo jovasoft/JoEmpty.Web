@@ -42,7 +42,7 @@ export default {
 		clientId: "",
 		clients: [],
 		contracts: [],
-		columns: ["code", "amount", "currency", "supply", "facilityCount", "formattedStartDate", "formattedFinishDate", "edit"],
+		columns: ["code", "amount", "supply", "facilityCount", "formattedStartDate", "formattedFinishDate", "edit"],
 		options: {
 			filterable: true,
 			perPage: 10,
@@ -52,7 +52,6 @@ export default {
 			headings: {
 				code: "Sözleşme Kodu",
 				amount: "Tutar",
-				currency: "Para Birimi",
 				supply: "Sarf Malzeme",
 				facilityCount: "Tesis Sayısı",
 				formattedStartDate: "Başlangıç Tarihi",
@@ -100,9 +99,9 @@ export default {
 			contracts.forEach(contract => {
 				if (contract.supply == 1) contract.supply = "Dahil";
 				else contract.supply = "Hariç";
-				if (contract.currency == 1) contract.currency = "TL";
-				else if (contract.currency == 2) contract.currency = "Euro";
-				else contract.currency = "Dolar";
+				if (contract.currency == 1) contract.amount = contract.amount + " ₺";
+				else if (contract.currency == 2) contract.amount = "€ " + contract.amount;
+				else contract.amount = "$ " + contract.amount;
 			});
 		}
 	},

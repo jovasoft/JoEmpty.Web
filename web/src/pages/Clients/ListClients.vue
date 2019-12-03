@@ -94,7 +94,7 @@ export default {
 			} else this.notify("error", "Hata", this.errorMessage);
 		},
 		edit(row) {
-			this.$router.push({ name: "addClients", params: { clientId: row.id } });
+			this.$router.push({ name: "editClients", params: { clientId: row.id } });
 		},
 		notify(type, title, text) {
 			this.$notify({
