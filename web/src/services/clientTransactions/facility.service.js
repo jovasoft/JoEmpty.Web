@@ -21,16 +21,16 @@ const FacilityService = {
 
 	GetOne: async function(id) {
 		try {
-			const response = await ApiService.Get(ApiService.baseAddress + "facility/GetOne/" + id);
+			const response = await ApiService.get(ApiService.baseAddress + "facility/GetOne/" + id);
 			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
-	GeyFacilitiesByContract: async function(contractId) {
+	GetFacilitiesByContract: async function(contractId) {
 		try {
-			const response = await ApiService.get(ApiService.baseAddress + "facility/GeyFacilitiesByContract/" + contractId);
+			const response = await ApiService.get(ApiService.baseAddress + "facility/GetFacilitiesByContract/" + contractId);
 			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);

@@ -64,6 +64,7 @@
 					<b-form-group label="Bölge" class="col-md-4">
 						<b-select v-model="area" @blur="$v.area.$touch()">
 							<option value="" disabled>Bölge seçiniz</option>
+							<option value="0cdf0c96-3269-40e7-a92e-3b33994c93be">Bölge</option>
 							<option v-for="(a, index) in areas" :value="a.id" :key="index"> {{ a.name }} </option>
 						</b-select>
 						<template v-if="$v.area.$error">
@@ -152,11 +153,17 @@
 					</b-form-group>
 				</b-form-row>
 				<b-form-group>
-					<b-btn class="btn-flat float-right" @click="addFacility" variant="primary">Sözleşme Ekle</b-btn>
+					<b-btn class="btn-flat float-right" @click="addFacility" variant="primary">{{ buttonTitle }}</b-btn>
 					<b-btn class="btn-flat float-right mr-2" @click="clearForm" variant="secondary">Temizle</b-btn>
 				</b-form-group>
 			</b-form>
 		</b-card>
+		<sweet-modal v-on:close="modalClosing" ref="successModal" icon="success" :hide-close-button="true">
+			<h4 class="font-weight-bold">Tesis Başarıyla Eklendi.</h4>
+			<div>
+				<small style="cursor: pointer;" v-on:click="refreshPage">Yeni bir tesis eklemek için <span class="font-weight-bold">buraya</span> tıklayınız.</small>
+			</div>
+		</sweet-modal>
 	</div>
 </template>
 
@@ -173,6 +180,7 @@ export default {
 	metaInfo: {
 		title: "Tesis Ekle"
 	},
+	props: ["clientId", "contractId", "facilityId"],
 	components: {
 		Datepicker
 	},
@@ -181,6 +189,7 @@ export default {
 		facilityEditMode: false,
 		isModalClosing: false,
 		pageTitle: "Tesis Ekle",
+		buttonTitle: "Tesis Ekle",
 		clients: [],
 		clientContracts: [],
 		areas: [],
@@ -235,24 +244,24 @@ export default {
 			required: requiredIf(function() {
 				return this.isElevator;
 			}),
-			validStationCount: stationCount => {
-				return /^\d+$/.test(stationCount);
+			validStationCount: function(stationCount) {
+				return /^\d+$/.test(stationCount) || !this.isElevator;
 			}
 		},
 		speed: {
 			required: requiredIf(function() {
 				return this.isElevator;
 			}),
-			validSpeed: speed => {
-				return /^\d+$/.test(speed);
+			validSpeed: function(speed) {
+				return /^\d+$/.test(speed) || !this.isElevator;
 			}
 		},
 		capacity: {
 			required: requiredIf(function() {
 				return this.isElevator;
 			}),
-			validCapacity: capacity => {
-				return /^\d+$/.test(capacity);
+			validCapacity: function(capacity) {
+				return /^\d+$/.test(capacity) || !this.isElevator;
 			}
 		},
 		maintenanceStatus: { required },
@@ -288,9 +297,13 @@ export default {
 			facilityResponse: "facility/response"
 		})
 	},
-	created() {
+	async created() {
 		this.getLocations();
-		this.getClients();
+		await this.getClients();
+		if (this.clientId && this.contractId) {
+			this.contractClientId = this.clientId;
+			this.facilityContractId = this.contractId;
+		}
 	},
 	watch: {
 		contractClientId(clientId) {
@@ -307,6 +320,37 @@ export default {
 	methods: {
 		async addFacility() {
 			this.$v.$touch();
+			if (!this.$v.$invalid) {
+				await this.$store.dispatch("facility/Add", {
+					contractId: this.facilityContractId,
+					code: this.facilityCode,
+					name: this.facilityName,
+					address: this.address,
+					province: this.province,
+					district: this.district,
+					areaId: this.areaId,
+					type: this.facilityType,
+					brand: this.brand,
+					warrantyFinishDate: this.warrantyDate,
+					station: this.stationCount,
+					speed: this.speed,
+					capacity: this.capacity,
+					maintenanceStatus: this.maintenanceStatus,
+					oldMaintenanceFee: this.oldMaintenanceFee,
+					currentMaintenanceFee: this.currentMaintenanceFee,
+					breakdownFee: this.breakdownFee
+				});
+				if (this.facilityResponse != null) {
+					if (this.facilityResponse.data.success) {
+						if (!this.contractEditMode) this.showModal();
+						else {
+							this.notify("success", "Başarılı", "Tesis başarıyla güncellendi.");
+							await this.sleep(1000);
+							this.$router.push({ name: "listFacilities", params: { contractsClientId: this.contractClientId, facilityContractId: this.facilityContractId } });
+						}
+					} else this.notify("error", "Hata", this.facilityResponse.data.message);
+				} else this.notify("error", "Hata", this.facilityErrorMessage);
+			}
 		},
 		async getClients() {
 			await this.$store.dispatch("client/Get");
@@ -319,8 +363,14 @@ export default {
 			await this.$store.dispatch("contract/GetContractsByClient", clientId);
 			if (this.contractResponse != null) {
 				if (this.contractResponse.data.success) this.clientContracts = this.contractResponse.data.data;
-				else this.notify("error", "Hata", this.contractResponse.data.message);
-			} else this.notify("error", "Hata", this.contractErrorMessage);
+				else {
+					this.notify("error", "Hata", this.contractResponse.data.message);
+					this.clientContracts = [];
+				}
+			} else {
+				if (this.contractErrorCode != 404) this.notify("error", "Hata", this.contractErrorMessage);
+				this.clientContracts = [];
+			}
 		},
 		getLocations() {
 			const req = new XMLHttpRequest();
@@ -364,6 +414,22 @@ export default {
 				ignoreDuplicates: true,
 				duration: 5000
 			});
+		},
+		showModal() {
+			this.$refs.successModal.open();
+		},
+		modalClosing() {
+			if (!this.isModalClosing) {
+				this.$router.push({ name: "listFacilities", params: { contractsClientId: this.contractClientId, facilityContractId: this.facilityContractId } });
+			}
+		},
+		refreshPage() {
+			this.isModalClosing = true;
+			this.$refs.successModal.close();
+			this.$router.go(0);
+		},
+		sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
 		}
 	}
 };
