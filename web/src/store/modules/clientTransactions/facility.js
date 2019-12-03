@@ -51,10 +51,10 @@ export const actions = {
 		}
 	},
 
-	async GetByContractFacilities({ commit }, contractId) {
+	async GetFacilitiesByContract({ commit }, contractId) {
 		try {
 			commit("changeStatus", "loading");
-			const response = await FacilityService.GetByContractFacilities(contractId);
+			const response = await FacilityService.GetFacilitiesByContract(contractId);
 			commit("success", response);
 		} catch (error) {
 			commit("error", {

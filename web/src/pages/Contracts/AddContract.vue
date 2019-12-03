@@ -119,6 +119,7 @@ export default {
 		pageTitle: "Sözleşme Ekle",
 		buttonTitle: "Sözleşme Ekle",
 		clients: [],
+		newContractId: "",
 		contractClientId: "",
 		contractCode: "",
 		startDate: "",
@@ -254,8 +255,10 @@ export default {
 				}
 				if (this.contractResponse != null) {
 					if (this.contractResponse.data.success) {
-						if (!this.contractEditMode) this.showModal();
-						else {
+						if (!this.contractEditMode) {
+							this.showModal();
+							this.newContractId = this.contractResponse.data.data.id;
+						} else {
 							this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
 							await this.sleep(1000);
 							this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
@@ -311,7 +314,7 @@ export default {
 		navigateToAddFacility() {
 			this.isModalClosing = true;
 			this.$refs.successModal.close();
-			this.$router.push({ name: "addFacility" });
+			this.$router.push({ name: "addFacility", params: { clientId: this.contractClientId, contractId: this.newContractId } });
 		},
 		onlyNumber($event) {
 			let keyCode = $event.keyCode ? $event.keyCode : $event.which;

@@ -6,13 +6,15 @@ export default [
 		component: AppLayout,
 		children: [
 			{
-				path: "list",
+				path: "list/:clientId?/:contractId?",
 				name: "listFacilities",
+				props: true,
 				component: () => import("@/pages/Facilities/ListFacilities")
 			},
 			{
-				path: "add",
+				path: "add/:clientId?/:contractId?/:facilityId?",
 				name: "addFacility",
+				props: true,
 				component: () => import("@/pages/Facilities/AddFacility")
 			}
 		]
