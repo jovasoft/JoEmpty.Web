@@ -227,7 +227,7 @@ export default {
 			} else this.notify("error", "Hata", this.facilityErrorMessage);
 		},
 		editFacility(row) {
-			this.$router.push({ name: "addFacility", params: { facilityId: row.id } });
+			this.$router.push({ name: "editFacility", params: { facilityId: row.id } });
 		},
 		notify(type, title, text) {
 			this.$notify({

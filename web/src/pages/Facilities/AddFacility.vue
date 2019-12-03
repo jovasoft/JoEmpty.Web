@@ -372,7 +372,7 @@ export default {
 				}
 				if (this.facilityResponse != null) {
 					if (this.facilityResponse.data.success) {
-						if (!this.facilityEditMode) this.showModal();
+						if (!this.facilityEditMode) this.notify("success", "Başarılı", this.facilityCode + "numaralı tesis başarıyla eklendi.");
 						else {
 							this.notify("success", "Başarılı", "Tesis başarıyla güncellendi.");
 							await this.sleep(1000);

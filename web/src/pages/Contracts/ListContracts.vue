@@ -156,7 +156,7 @@ export default {
 			} else this.notify("error", "Hata", this.contractErrorMessage);
 		},
 		editContract(row) {
-			this.$router.push({ name: "addContract", params: { contractId: row.id } });
+			this.$router.push({ name: "editContract", params: { contractId: row.id } });
 		},
 		notify(type, title, text) {
 			this.$notify({
