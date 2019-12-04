@@ -15,7 +15,8 @@ const ContractService = {
 			const response = await ApiService.get(ApiService.baseAddress + "contract");
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -24,7 +25,8 @@ const ContractService = {
 			const response = await ApiService.get(ApiService.baseAddress + "contract/GetOne/" + id);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -33,7 +35,8 @@ const ContractService = {
 			const response = await ApiService.get(ApiService.baseAddress + "contract/GetContractsByClient/" + clientId);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -42,7 +45,8 @@ const ContractService = {
 			const response = await ApiService.post(ApiService.baseAddress + "contract", contract);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -51,7 +55,8 @@ const ContractService = {
 			const response = await ApiService.put(ApiService.baseAddress + "contract/" + id, contract);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -60,7 +65,8 @@ const ContractService = {
 			const response = await ApiService.delete(ApiService.baseAddress + "contract/" + id);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -69,7 +75,8 @@ const ContractService = {
 			const response = await ApiService.post(ApiService.baseAddress + "contract/UploadFile/" + id, files);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -78,7 +85,8 @@ const ContractService = {
 			const response = await ApiService.get(ApiService.baseAddress + "contract/GetFiles/" + contractId);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -87,7 +95,8 @@ const ContractService = {
 			const response = await ApiService.delete(ApiService.baseAddress + "contract/DeleteFile/" + contractId + "/" + fileId);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	}
 };

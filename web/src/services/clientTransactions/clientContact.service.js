@@ -15,7 +15,8 @@ const ClientContactService = {
 			const response = await ApiService.get(ApiService.baseAddress + "clientContact/" + clientId);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -24,7 +25,8 @@ const ClientContactService = {
 			const response = await ApiService.Get(ApiService.baseAddress + "clientContact/GetOne/" + id);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -33,7 +35,8 @@ const ClientContactService = {
 			const response = await ApiService.post(ApiService.baseAddress + "clientContact", clientContact);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -42,7 +45,8 @@ const ClientContactService = {
 			const response = await ApiService.put(ApiService.baseAddress + "clientContact/" + id, clientContact);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -51,7 +55,8 @@ const ClientContactService = {
 			const response = await ApiService.delete(ApiService.baseAddress + "clientContact/" + id);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	}
 };
