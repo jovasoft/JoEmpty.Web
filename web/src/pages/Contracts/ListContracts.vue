@@ -108,9 +108,9 @@ export default {
 			contracts.forEach(contract => {
 				if (contract.supply == 1) contract.supply = "Dahil";
 				else contract.supply = "Hariç";
-				if (contract.currency == 1) contract.amount = contract.amount + " ₺";
-				else if (contract.currency == 2) contract.amount = "€ " + contract.amount;
-				else contract.amount = "$ " + contract.amount;
+				if (contract.currency == 1 && !contract.amount.toString().includes("₺")) contract.amount = contract.amount + " ₺";
+				else if (contract.currency == 2 && !contract.amount.toString().includes("€")) contract.amount = "€ " + contract.amount;
+				else if (contract.currency == 3 && !contract.amount.toString().includes("$")) contract.amount = "$ " + contract.amount;
 			});
 		},
 		clientStatus(status) {
