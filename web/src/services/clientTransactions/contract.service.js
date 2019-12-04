@@ -30,7 +30,7 @@ const ContractService = {
 
 	GetContractsByClient: async function(clientId) {
 		try {
-			const response = await ApiService.get(ApiService.baseAddress + "contract/GetByClientContracts/" + clientId);
+			const response = await ApiService.get(ApiService.baseAddress + "contract/GetContractsByClient/" + clientId);
 			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);
@@ -58,6 +58,33 @@ const ContractService = {
 	Delete: async function(id) {
 		try {
 			const response = await ApiService.delete(ApiService.baseAddress + "contract/" + id);
+			return response;
+		} catch (error) {
+			throw new UpdateError(error.response.status, error.response.data.message);
+		}
+	},
+
+	UploadFile: async function(id, files) {
+		try {
+			const response = await ApiService.post(ApiService.baseAddress + "contract/UploadFile/" + id, files);
+			return response;
+		} catch (error) {
+			throw new UpdateError(error.response.status, error.response.data.message);
+		}
+	},
+
+	GetFiles: async function(contractId) {
+		try {
+			const response = await ApiService.get(ApiService.baseAddress + "contract/GetFiles/" + contractId);
+			return response;
+		} catch (error) {
+			throw new UpdateError(error.response.status, error.response.data.message);
+		}
+	},
+
+	DeleteFile: async function(contractId, fileId) {
+		try {
+			const response = await ApiService.delete(ApiService.baseAddress + "contract/DeleteFile/" + contractId + "/" + fileId);
 			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);

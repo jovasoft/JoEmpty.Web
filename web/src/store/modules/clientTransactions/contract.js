@@ -101,6 +101,45 @@ export const actions = {
 				errorMessage: error.message
 			});
 		}
+	},
+
+	async UploadFile({ commit }, model) {
+		try {
+			commit("changeStatus", "loading");
+			const response = await ContractService.UploadFile(model.id, model.files);
+			commit("success", response);
+		} catch (error) {
+			commit("error", {
+				errorCode: error.errorCode,
+				errorMessage: error.message
+			});
+		}
+	},
+
+	async GetFiles({ commit }, contractId) {
+		try {
+			commit("changeStatus", "loading");
+			const response = await ContractService.GetFiles(contractId);
+			commit("success", response);
+		} catch (error) {
+			commit("error", {
+				errorCode: error.errorCode,
+				errorMessage: error.message
+			});
+		}
+	},
+
+	async DeleteFile({ commit }, model) {
+		try {
+			commit("changeStatus", "loading");
+			const response = await ContractService.DeleteFile(model.contractId, model.fileId);
+			commit("success", response);
+		} catch (error) {
+			commit("error", {
+				errorCode: error.errorCode,
+				errorMessage: error.message
+			});
+		}
 	}
 };
 
