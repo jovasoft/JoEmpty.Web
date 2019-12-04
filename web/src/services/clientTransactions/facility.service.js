@@ -15,7 +15,8 @@ const FacilityService = {
 			const response = await ApiService.get(ApiService.baseAddress + "facility");
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -24,7 +25,8 @@ const FacilityService = {
 			const response = await ApiService.get(ApiService.baseAddress + "facility/GetOne/" + id);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -33,7 +35,8 @@ const FacilityService = {
 			const response = await ApiService.get(ApiService.baseAddress + "facility/GetFacilitiesByContract/" + contractId);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -42,7 +45,8 @@ const FacilityService = {
 			const response = await ApiService.get(ApiService.baseAddress + "facility/GetFacilitiesByClient/" + clientId);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -51,7 +55,8 @@ const FacilityService = {
 			const response = await ApiService.post(ApiService.baseAddress + "facility", facility);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -60,7 +65,8 @@ const FacilityService = {
 			const response = await ApiService.put(ApiService.baseAddress + "facility/" + id, facility);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -69,7 +75,8 @@ const FacilityService = {
 			const response = await ApiService.delete(ApiService.baseAddress + "facility/" + id);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	}
 };

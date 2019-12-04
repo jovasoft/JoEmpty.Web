@@ -15,7 +15,8 @@ const AreaService = {
 			const response = await ApiService.get(ApiService.baseAddress + "area");
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -24,7 +25,8 @@ const AreaService = {
 			const response = await ApiService.Get(ApiService.baseAddress + "area/GetOne/" + id);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -33,7 +35,8 @@ const AreaService = {
 			const response = await ApiService.post(ApiService.baseAddress + "area", area);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -41,7 +44,8 @@ const AreaService = {
 		try {
 			await ApiService.put(ApiService.baseAddress + "area/" + id, area);
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	},
 
@@ -50,7 +54,8 @@ const AreaService = {
 			const response = await ApiService.delete(ApiService.baseAddress + "area/" + id);
 			return response;
 		} catch (error) {
-			throw new UpdateError(error.response.status, error.response.data.message);
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
 		}
 	}
 };
