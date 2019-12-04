@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Sözleşmeler /</span> {{ pageTitle }}</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<b-card header="Sözleşme Bilgileri" header-tag="h6" class="mb-3">
@@ -100,6 +101,8 @@ import vue2Dropzone from "vue2-dropzone";
 import { mapGetters } from "vuex";
 import { required } from "vuelidate/lib/validators";
 import { SweetModal } from "sweet-modal-vue";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
 	name: "contracts-add",
@@ -110,9 +113,11 @@ export default {
 	components: {
 		vueDropzone: vue2Dropzone,
 		Datepicker,
-		SweetModal
+		SweetModal,
+		Loading
 	},
 	data: () => ({
+		isLoading: false,
 		suffix: "₺",
 		contractEditMode: false,
 		isModalClosing: false,
@@ -183,9 +188,11 @@ export default {
 			contractErrorMessage: "contract/errorMessage",
 			contractErrorCode: "contract/errorCode",
 			contractResponse: "contract/response",
+			contractStatus: "contract/status",
 			clientErrorMessage: "client/errorMessage",
 			clientErrorCode: "client/errorCode",
-			clientResponse: "client/response"
+			clientResponse: "client/response",
+			clientStatus: "client/status"
 		})
 	},
 	async created() {
@@ -213,6 +220,14 @@ export default {
 			if (newValue == "TL") this.suffix = "₺";
 			else if (newValue == "Euro") this.suffix = "€";
 			else this.suffix = "$";
+		},
+		clientStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
+		},
+		contractStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
 		}
 	},
 	methods: {

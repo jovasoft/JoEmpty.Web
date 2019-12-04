@@ -30,7 +30,7 @@ const ContractService = {
 
 	GetContractsByClient: async function(clientId) {
 		try {
-			const response = await ApiService.get(ApiService.baseAddress + "contract/GetByClientContracts/" + clientId);
+			const response = await ApiService.get(ApiService.baseAddress + "contract/GetContractsByClient/" + clientId);
 			return response;
 		} catch (error) {
 			throw new UpdateError(error.response.status, error.response.data.message);
