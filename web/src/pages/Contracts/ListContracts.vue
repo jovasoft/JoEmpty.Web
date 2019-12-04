@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Sözleşmeler /</span> Sözleşme Listesi</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<v-client-table :data="contracts" :options="options" :columns="columns">
@@ -29,6 +30,8 @@
 import { ClientTable } from "vue-tables-2";
 import Vue from "vue";
 import { mapGetters } from "vuex";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 Vue.use(ClientTable);
 
@@ -37,8 +40,12 @@ export default {
 	metaInfo: {
 		title: "Sözleşme Listesi"
 	},
+	components: {
+		Loading
+	},
 	props: ["contractsClientId"],
 	data: () => ({
+		isLoading: false,
 		clientId: "",
 		clients: [],
 		contracts: [],
@@ -81,9 +88,11 @@ export default {
 			contractErrorMessage: "contract/errorMessage",
 			contractErrorCode: "contract/errorCode",
 			contractResponse: "contract/response",
+			contractStatus: "contract/status",
 			clientErrorMessage: "client/errorMessage",
 			clientErrorCode: "client/errorCode",
-			clientResponse: "client/response"
+			clientResponse: "client/response",
+			clientStatus: "client/status"
 		})
 	},
 	async created() {
@@ -103,6 +112,14 @@ export default {
 				else if (contract.currency == 2) contract.amount = "€ " + contract.amount;
 				else contract.amount = "$ " + contract.amount;
 			});
+		},
+		clientStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
+		},
+		contractStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
 		}
 	},
 	methods: {

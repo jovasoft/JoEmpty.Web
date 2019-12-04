@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Müşteriler /</span> {{ pageTitle }}</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<form-wizard class="form-wizard-vertical-left mb-5">
@@ -139,6 +140,8 @@ import { required, email } from "vuelidate/lib/validators";
 import Vue from "vue";
 import { mapGetters } from "vuex";
 import { SweetModal } from "sweet-modal-vue";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 Vue.use(ClientTable);
 
@@ -153,9 +156,11 @@ export default {
 		TabContent,
 		WizardStep,
 		MaskedInput,
-		SweetModal
+		SweetModal,
+		Loading
 	},
 	data: () => ({
+		isLoading: false,
 		isModalClosing: false,
 		clientEditMode: false,
 		pageTitle: "Müşteri Ekle",
@@ -252,10 +257,22 @@ export default {
 			clientErrorMessage: "client/errorMessage",
 			clientErrorCode: "client/errorCode",
 			clientResponse: "client/response",
+			clientStatus: "client/status",
 			clientContactErrorMessage: "clientContact/errorMessage",
 			clientContactErrorCode: "clientContact/errorCode",
-			clientContactResponse: "clientContact/response"
+			clientContactResponse: "clientContact/response",
+			clientContactStatus: "clientContact/status"
 		})
+	},
+	watch: {
+		clientStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
+		},
+		clientContactStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
+		}
 	},
 	created() {
 		if (this.clientId) {

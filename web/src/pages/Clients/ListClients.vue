@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Müşteriler /</span> Müşteri Listesi</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<v-client-table ref="clientTable" :data="clients" :columns="columns" :options="options">
@@ -19,6 +20,8 @@
 import Vue from "vue";
 import { ClientTable } from "vue-tables-2";
 import { mapGetters } from "vuex";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 Vue.use(ClientTable);
 
@@ -27,7 +30,11 @@ export default {
 	metaInfo: {
 		title: "Müşteri Listesi"
 	},
+	components: {
+		Loading
+	},
 	data: () => ({
+		isLoading: false,
 		clients: [],
 		columns: ["currentCode", "title", "province", "district", "edit"],
 		options: {
@@ -64,11 +71,18 @@ export default {
 		...mapGetters({
 			errorMessage: "client/errorMessage",
 			errorCode: "client/errorCode",
-			response: "client/response"
+			response: "client/response",
+			status: "client/status"
 		})
 	},
 	created() {
 		this.getClients();
+	},
+	watch: {
+		status(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
+		}
 	},
 	methods: {
 		async getClients() {

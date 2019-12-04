@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<loading :active.sync="isLoading" :can-cancel="false" :is-full-page="false"></loading>
+		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> Tesis Listesi</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<v-client-table ref="facilityTable" :data="facilities" v-on:filter="filterChange" :options="options" :columns="columns">

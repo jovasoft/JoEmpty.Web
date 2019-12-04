@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<loading :active.sync="isLoading" :can-cancel="false" :is-full-page="false"></loading>
+		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> {{ pageTitle }}</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<b-card header="Tesis Bilgileri" header-tag="h6" class="mb-3">
