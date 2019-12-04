@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<loading :active.sync="isLoading" :can-cancel="false" :is-full-page="false"></loading>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> Tesis Listesi</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<v-client-table ref="facilityTable" :data="facilities" v-on:filter="filterChange" :options="options" :columns="columns">
@@ -37,6 +38,8 @@
 import { ClientTable } from "vue-tables-2";
 import Vue from "vue";
 import { mapGetters } from "vuex";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 Vue.use(ClientTable);
 
@@ -46,7 +49,11 @@ export default {
 		title: "Tesis Ekle"
 	},
 	props: ["clientId", "contractId"],
+	components: {
+		Loading
+	},
 	data: () => ({
+		isLoading: false,
 		isClientSelected: false,
 		contractClientId: "",
 		facilityContractId: "",
@@ -94,12 +101,15 @@ export default {
 			clientErrorMessage: "client/errorMessage",
 			clientErrorCode: "client/errorCode",
 			clientResponse: "client/response",
+			clientStatus: "client/status",
 			contractErrorMessage: "contract/errorMessage",
 			contractErrorCode: "contract/errorCode",
 			contractResponse: "contract/response",
+			contractStatus: "contract/status",
 			facilityErrorMessage: "facility/errorMessage",
 			facilityErrorCode: "facility/errorCode",
-			facilityResponse: "facility/response"
+			facilityResponse: "facility/response",
+			facilityStatus: "facility/status"
 		})
 	},
 	async created() {
@@ -132,6 +142,18 @@ export default {
 				if (facility.maintenanceStatus == 1) facility.maintenanceStatus = "Aktif";
 				else facility.maintenanceStatus = "Pasif";
 			});
+		},
+		clientStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
+		},
+		contractStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
+		},
+		facilityStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
 		}
 	},
 	methods: {

@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<loading :active.sync="isLoading" :can-cancel="false" :is-full-page="false"></loading>
 		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> {{ pageTitle }}</h4>
 		<hr class="container-m-nx border-light mt-0 mb-3" />
 		<b-card header="Tesis Bilgileri" header-tag="h6" class="mb-3">
@@ -174,6 +175,8 @@ import Datepicker from "vuejs-datepicker";
 import { tr } from "vuejs-datepicker/dist/locale";
 import { required, requiredIf } from "vuelidate/lib/validators/";
 import { mapGetters } from "vuex";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
 	name: "facilities-add",
@@ -182,9 +185,11 @@ export default {
 	},
 	props: ["clientId", "contractId", "facilityId"],
 	components: {
-		Datepicker
+		Datepicker,
+		Loading
 	},
 	data: () => ({
+		isLoading: false,
 		isElevator: true,
 		facilityEditMode: false,
 		isModalClosing: false,
@@ -289,12 +294,15 @@ export default {
 			clientErrorMessage: "client/errorMessage",
 			clientErrorCode: "client/errorCode",
 			clientResponse: "client/response",
+			clientStatus: "client/status",
 			contractErrorMessage: "contract/errorMessage",
 			contractErrorCode: "contract/errorCode",
 			contractResponse: "contract/response",
+			contractStatus: "contract/status",
 			facilityErrorMessage: "facility/errorMessage",
 			facilityErrorCode: "facility/errorCode",
-			facilityResponse: "facility/response"
+			facilityResponse: "facility/response",
+			facilityStatus: "facility/status"
 		})
 	},
 	async created() {
@@ -318,6 +326,18 @@ export default {
 			else if (type == "MR") this.isElevator = true;
 			else if (type == "MRL") this.isElevator = true;
 			else this.isElevator = true;
+		},
+		clientStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
+		},
+		contractStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
+		},
+		facilityStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
 		}
 	},
 	methods: {
