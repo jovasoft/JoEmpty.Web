@@ -74,7 +74,7 @@
 					</b-form-group>
 				</b-form-row>
 				<b-form-group label="Dosyalar">
-					<vue-dropzone ref="fileUpload" @vdropzone-sending="sending" @vdropzone-success="vsuccess" @vdropzone-error="verror" id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" />
+					<vue-dropzone ref="fileUpload" @vdropzone-success="vsuccess" @vdropzone-error="verror" id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" />
 				</b-form-group>
 				<b-btn class="btn-flat float-right" type="submit" variant="primary">{{ buttonTitle }}</b-btn>
 			</b-form>
@@ -117,7 +117,6 @@ export default {
 		Loading
 	},
 	data: () => ({
-		files: [],
 		isLoading: false,
 		suffix: "₺",
 		contractEditMode: false,
@@ -140,12 +139,12 @@ export default {
 		endDisabledDates: {},
 		tr: tr,
 		dropzoneOptions: {
-			url: "http://localhost:5002/api/Contract/Upload/",
-			parallelUploads: 1,
-			uploadMultiple: true,
+			url: "http://localhost:5002/api/Contract/UploadFile/",
+			parallelUploads: 2,
+			uploadMultiple: false,
 			maxFilesize: 5000,
 			filesizeBase: 1000,
-			acceptedFiles: ".jpg,.jpeg,.png,.png,.txt",
+			acceptedFiles: ".jpg,.jpeg,.png,.pdf,.txt",
 			autoProcessQueue: false,
 			addRemoveLinks: true,
 			dictDefaultMessage: `Dosya yüklemek için tıklayın`,
@@ -234,17 +233,13 @@ export default {
 		}
 	},
 	methods: {
-		vsuccess() {
+		async vsuccess() {
 			this.showModal();
 		},
 		async verror() {
-			this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
 			this.notify("error", "Hata", "Dosyalar yüklenirken bir hata oluştu.");
 			await this.sleep(1000);
 			this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
-		},
-		sending(file, xhr, formData) {
-			formData.append("Files", file);
 		},
 		async getClients() {
 			await this.$store.dispatch("client/Get");
@@ -288,6 +283,7 @@ export default {
 						if (!this.contractEditMode) {
 							this.newContractId = this.contractResponse.data.data.id;
 							if (this.$refs.fileUpload.getAcceptedFiles().length > 0) {
+								this.notify("success", "Başarılı", "Sözleşme başarıyla eklendi.");
 								this.$refs.fileUpload.setOption("url", this.dropzoneOptions.url + this.newContractId);
 								this.$refs.fileUpload.processQueue();
 							} else this.showModal();
