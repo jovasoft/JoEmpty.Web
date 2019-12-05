@@ -72,7 +72,7 @@ const ContractService = {
 
 	UploadFile: async function(id, files) {
 		try {
-			const response = await ApiService.post(ApiService.baseAddress + "contract/UploadFile/" + id, files);
+			const response = await ApiService.post(ApiService.baseAddress + "contract/Upload/" + id, files);
 			return response;
 		} catch (error) {
 			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");

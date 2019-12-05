@@ -117,6 +117,8 @@ export default {
 		Loading
 	},
 	data: () => ({
+		errorCount: 0,
+		successCount: 0,
 		isLoading: false,
 		suffix: "₺",
 		contractEditMode: false,
@@ -139,8 +141,9 @@ export default {
 		endDisabledDates: {},
 		tr: tr,
 		dropzoneOptions: {
-			url: "http://localhost:5002/api/Contract/UploadFile/",
-			parallelUploads: 2,
+			url: "http://localhost:5002/api/Contract/Upload/",
+			parallelUploads: 10,
+			paramName: "files",
 			uploadMultiple: false,
 			maxFilesize: 5000,
 			filesizeBase: 1000,
@@ -234,12 +237,17 @@ export default {
 	},
 	methods: {
 		async vsuccess() {
-			this.showModal();
+			this.successCount++;
+			if (this.successCount == this.$refs.fileUpload.getAcceptedFiles().length) this.showModal();
 		},
 		async verror() {
-			this.notify("error", "Hata", "Dosyalar yüklenirken bir hata oluştu.");
-			await this.sleep(1000);
-			this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+			this.errorCount++;
+			if (this.errorCount == this.$refs.fileUpload.getAcceptedFiles().length) {
+				this.notify("success", "Başarılı", "Sözleşme başarıyla eklendi.");
+				this.notify("error", "Hata", "Dosyalar yüklenirken bir hata oluştu.");
+				await this.sleep(2000);
+				this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+			}
 		},
 		async getClients() {
 			await this.$store.dispatch("client/Get");
@@ -283,7 +291,6 @@ export default {
 						if (!this.contractEditMode) {
 							this.newContractId = this.contractResponse.data.data.id;
 							if (this.$refs.fileUpload.getAcceptedFiles().length > 0) {
-								this.notify("success", "Başarılı", "Sözleşme başarıyla eklendi.");
 								this.$refs.fileUpload.setOption("url", this.dropzoneOptions.url + this.newContractId);
 								this.$refs.fileUpload.processQueue();
 							} else this.showModal();
