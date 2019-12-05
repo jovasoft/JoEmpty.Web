@@ -238,11 +238,15 @@ export default {
 	methods: {
 		async vsuccess() {
 			this.successCount++;
-			if (this.successCount == this.$refs.fileUpload.getAcceptedFiles().length) this.showModal();
+			if (this.successCount == this.$refs.fileUpload.getAcceptedFiles().length) {
+				this.successCount = 0;
+				this.showModal();
+			}
 		},
 		async verror() {
 			this.errorCount++;
 			if (this.errorCount == this.$refs.fileUpload.getAcceptedFiles().length) {
+				this.errorCount = 0;
 				this.notify("success", "Başarılı", "Sözleşme başarıyla eklendi.");
 				this.notify("error", "Hata", "Dosyalar yüklenirken bir hata oluştu.");
 				await this.sleep(2000);
