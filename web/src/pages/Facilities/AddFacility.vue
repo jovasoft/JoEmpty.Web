@@ -507,7 +507,7 @@ export default {
 			this.$refs.successModal.open();
 		},
 		modalClosing() {
-			if (!this.isModalClosing) {
+			if (this.$refs.successModal.is_open && !this.isModalClosing) {
 				this.$router.push({ name: "listFacilities", params: { clientId: this.contractClientId, contractId: this.facilityContractId } });
 			}
 		},

@@ -402,7 +402,7 @@ export default {
 			this.$refs.successModal.open();
 		},
 		modalClosing() {
-			if (!this.isModalClosing) this.$router.push({ name: "listClients" });
+			if (this.$refs.successModal.is_open && !this.isModalClosing) this.$router.push({ name: "listClients" });
 		},
 		refreshPage() {
 			this.isModalClosing = true;

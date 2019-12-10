@@ -18,8 +18,8 @@
 					<template slot="link-text">
 						Müşteriler
 					</template>
-					<sidenav-router-link to="/client-transactions/clients/list" :exact="true">Müşteri Listesi</sidenav-router-link>
-					<sidenav-router-link to="/client-transactions/clients/add" :exact="true">Müşteri Ekle</sidenav-router-link>
+					<sidenav-router-link to="/client-transactions/clients/list">Müşteri Listesi</sidenav-router-link>
+					<sidenav-router-link to="/client-transactions/clients/add">Müşteri Ekle</sidenav-router-link>
 				</sidenav-menu>
 				<sidenav-menu icon="ion ion-md-copy" :active="isMenuActive('/client-transactions/contracts')" :open="isMenuOpen('/client-transactions/contracts')">
 					<template slot="link-text">

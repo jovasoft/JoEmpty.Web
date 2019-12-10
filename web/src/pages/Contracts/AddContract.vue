@@ -74,7 +74,7 @@
 					</b-form-group>
 				</b-form-row>
 				<b-form-group label="Dosyalar">
-					<vue-dropzone ref="fileUpload" @vdropzone-success="vsuccess" @vdropzone-error="verror" id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" />
+					<vue-dropzone ref="fileUpload" @vdropzone-success="vsuccess" @vdropzone-error="verror" @vdropzone-removed-file="vremoved" id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" />
 				</b-form-group>
 				<b-btn class="btn-flat float-right" type="submit" variant="primary">{{ buttonTitle }}</b-btn>
 			</b-form>
@@ -117,6 +117,8 @@ export default {
 		Loading
 	},
 	data: () => ({
+		files: [],
+		filesToDelete: [],
 		errorCount: 0,
 		successCount: 0,
 		isLoading: false,
@@ -207,7 +209,8 @@ export default {
 			this.contractEditMode = true;
 			this.pageTitle = "Sözleşme Düzenle";
 			this.buttonTitle = "Kaydet";
-			this.getContract(this.contractId);
+			await this.getContract(this.contractId);
+			await this.getFiles(this.contractId);
 		}
 	},
 	watch: {
@@ -216,7 +219,7 @@ export default {
 				to: new Date(newValue)
 			};
 			if (!newValue) this.endDate = "";
-			else {
+			else if (typeof newValue != "string") {
 				this.endDate = new Date(newValue.getTime());
 				this.endDate.setFullYear(this.endDate.getFullYear() + 2);
 			}
@@ -236,21 +239,41 @@ export default {
 		}
 	},
 	methods: {
+		vremoved(fileToDelete) {
+			if (this.contractEditMode) {
+				this.files.forEach(file => {
+					if (fileToDelete.name == file.name) {
+						this.filesToDelete.push(file.id);
+					}
+				});
+			}
+		},
 		async vsuccess() {
 			this.successCount++;
 			if (this.successCount == this.$refs.fileUpload.getAcceptedFiles().length) {
 				this.successCount = 0;
-				this.showModal();
+				if (!this.contractEditMode) this.showModal();
+				else {
+					this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
+					await this.sleep(1000);
+					this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+				}
 			}
 		},
 		async verror() {
 			this.errorCount++;
 			if (this.errorCount == this.$refs.fileUpload.getAcceptedFiles().length) {
 				this.errorCount = 0;
-				this.notify("success", "Başarılı", "Sözleşme başarıyla eklendi.");
-				this.notify("error", "Hata", "Dosyalar yüklenirken bir hata oluştu.");
-				await this.sleep(2000);
-				this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+				if (!this.contractEditMode) {
+					this.notify("success", "Başarılı", "Sözleşme başarıyla eklendi.");
+					this.notify("error", "Hata", "Dosyalar yüklenirken bir hata oluştu.");
+					await this.sleep(2000);
+					this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+				} else {
+					this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
+					await this.sleep(1000);
+					this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+				}
 			}
 		},
 		async getClients() {
@@ -299,13 +322,36 @@ export default {
 								this.$refs.fileUpload.processQueue();
 							} else this.showModal();
 						} else {
-							this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
-							await this.sleep(1000);
-							this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+							if (this.filesToDelete.length > 0) await this.deleteFiles();
+							if (this.$refs.fileUpload.getAcceptedFiles().length > 0) this.uploadNewFiles();
+							else {
+								this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
+								await this.sleep(1000);
+								this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+							}
 						}
 					} else this.notify("error", "Hata", this.contractResponse.data.message);
 				} else this.notify("error", "Hata", this.contractErrorMessage);
 			}
+		},
+		async deleteFiles() {
+			this.filesToDelete.forEach(async id => {
+				await this.$store.dispatch("contract/DeleteFile", {
+					contractId: this.contractId,
+					fileId: id
+				});
+			});
+		},
+		async uploadNewFiles() {
+			this.$refs.fileUpload.getAcceptedFiles().forEach(fileToUpload => {
+				this.files.forEach(file => {
+					if (fileToUpload.name == file.name) {
+						this.$refs.fileUpload.removeFile(fileToUpload);
+					}
+				});
+			});
+			this.$refs.fileUpload.setOption("url", this.dropzoneOptions.url + this.contractId);
+			this.$refs.fileUpload.processQueue();
 		},
 		async getContract(contractId) {
 			await this.$store.dispatch("contract/GetOne", contractId);
@@ -314,6 +360,22 @@ export default {
 					this.fillForms(this.contractResponse.data.data);
 				} else this.notify("error", "Hata", this.contractResponse.data.message);
 			} else this.notify("error", "Hata", this.contractErrorMessage);
+		},
+		async getFiles(contractId) {
+			await this.$store.dispatch("contract/GetFiles", contractId);
+			if (this.contractResponse != null) {
+				if (this.contractResponse.data.success) {
+					this.files = this.contractResponse.data.data.files;
+					this.addFilesToDropzone();
+				} else this.notify("error", "Hata", this.contractResponse.data.message);
+			} else this.notify("error", "Hata", this.contractErrorMessage);
+		},
+		addFilesToDropzone() {
+			this.files.forEach(file => {
+				var newFile = { size: file.size, name: file.name, type: file.type };
+				var url = file.url;
+				this.$refs.fileUpload.manuallyAddFile(newFile, url);
+			});
 		},
 		fillForms(contract) {
 			this.contractClientId = contract.clientId;
@@ -342,7 +404,7 @@ export default {
 			this.$refs.successModal.open();
 		},
 		modalClosing() {
-			if (!this.isModalClosing) {
+			if (this.$refs.successModal.is_open && !this.isModalClosing) {
 				this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
 			}
 		},
