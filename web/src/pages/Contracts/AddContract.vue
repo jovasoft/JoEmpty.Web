@@ -345,9 +345,7 @@ export default {
 		async uploadNewFiles() {
 			this.$refs.fileUpload.getAcceptedFiles().forEach(fileToUpload => {
 				this.files.forEach(file => {
-					if (fileToUpload.name == file.name) {
-						this.$refs.fileUpload.removeFile(fileToUpload);
-					}
+					if (fileToUpload.name == file.name) this.$refs.fileUpload.removeFile(fileToUpload);
 				});
 			});
 			this.$refs.fileUpload.setOption("url", this.dropzoneOptions.url + this.contractId);
@@ -368,7 +366,7 @@ export default {
 					this.files = this.contractResponse.data.data.files;
 					this.addFilesToDropzone();
 				} else this.notify("error", "Hata", this.contractResponse.data.message);
-			} else this.notify("error", "Hata", this.contractErrorMessage);
+			} else if (this.contractErrorCode != 404) this.notify("error", "Hata", this.contractErrorMessage);
 		},
 		addFilesToDropzone() {
 			this.files.forEach(file => {

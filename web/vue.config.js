@@ -10,6 +10,9 @@ module.exports = {
     /\bvuedraggable\b/
   ],
   chainWebpack: config => {
+    config.module.exports = {
+      mode: "production"
+    }
     // Add "node_modules" alias
     config.resolve.alias
       .set('node_modules', path.join(__dirname, './node_modules'))
