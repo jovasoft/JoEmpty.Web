@@ -13,7 +13,7 @@ class AuthenticationError extends Error {
 const AuthService = {
 	register: async function(credentials) {
 		try {
-			const response = await ApiService.post("http://207.154.196.92:5000/api/auth/register", credentials);
+			const response = await ApiService.post(ApiService.baseAddress + "auth/register", credentials);
 			StorageService.saveUser(response.data);
 			ApiService.setHeader();
 			ApiService.mount401Interceptor();
@@ -25,7 +25,7 @@ const AuthService = {
 
 	login: async function(credentials) {
 		try {
-			const response = await ApiService.post("http://207.154.196.92:5000/api/auth/login", credentials);
+			const response = await ApiService.post(ApiService.baseAddress + "auth/login", credentials);
 			StorageService.saveUser(response.data);
 			ApiService.setHeader();
 			ApiService.mount401Interceptor();
