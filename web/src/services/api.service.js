@@ -4,8 +4,7 @@ import { StorageService } from "../services/storage.service";
 
 const ApiService = {
 	_401interceptor: null,
-	baseAddress: "http://172.17.0.2:5000/api/",
-	//baseAddress: "http://207.154.196.92:5000/api/",
+	baseAddress: "http://207.154.196.92:5000/api/",
 	init() {},
 
 	setHeader() {
