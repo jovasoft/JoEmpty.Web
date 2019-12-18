@@ -57,19 +57,13 @@
 					</b-form-group>
 				</b-form-row>
 				<b-form-row>
-					<b-form-group label="Sarf Malzeme" class="col-md-6">
+					<b-form-group label="Sarf Malzeme" class="col-md-12">
 						<b-select v-model="supply" @blur="$v.supply.$touch()">
 							<option value="Internal">Dahil</option>
 							<option value="External">Hariç</option>
 						</b-select>
 						<template v-if="$v.supply.$error">
 							<small v-if="!$v.supply.required" class="form-text text-danger">Sarf malzeme boş geçilemez.</small>
-						</template>
-					</b-form-group>
-					<b-form-group label="Tesis Sayısı" class="col-md-6">
-						<b-input v-model="facilityCount" @keypress="onlyNumber" @blur="$v.facilityCount.$touch()" maxLength="3" placeholder="Tesis Sayısı" type="text" class="form-control" />
-						<template v-if="$v.facilityCount.$error">
-							<small v-if="!$v.facilityCount.required || !$v.facilityCount.validFacilityCount" class="form-text text-danger">Tesis sayısı boş geçilemez.</small>
 						</template>
 					</b-form-group>
 				</b-form-row>
@@ -136,7 +130,6 @@ export default {
 		price: "",
 		currency: "TL",
 		supply: "Internal",
-		facilityCount: "",
 		startDisabledDates: {
 			to: new Date(2010, 1, 1)
 		},
@@ -182,13 +175,7 @@ export default {
 			}
 		},
 		currency: { required },
-		supply: { required },
-		facilityCount: {
-			required,
-			validFacilityCount: facilityCount => {
-				return /^\d+$/.test(facilityCount);
-			}
-		}
+		supply: { required }
 	},
 	computed: {
 		...mapGetters({
@@ -221,7 +208,7 @@ export default {
 			if (!newValue) this.endDate = "";
 			else if (typeof newValue != "string") {
 				this.endDate = new Date(newValue.getTime());
-				this.endDate.setFullYear(this.endDate.getFullYear() + 2);
+				this.endDate.setFullYear(this.endDate.getFullYear() + 1);
 			}
 		},
 		currency(newValue) {
@@ -295,8 +282,7 @@ export default {
 						finishDate: this.endDate,
 						amount: this.price,
 						currency: this.currency,
-						supply: this.supply,
-						facilityCount: this.facilityCount
+						supply: this.supply
 					});
 				} else {
 					await this.$store.dispatch("contract/Update", {
@@ -308,8 +294,7 @@ export default {
 							finishDate: this.endDate,
 							amount: this.price,
 							currency: this.currency,
-							supply: this.supply,
-							facilityCount: this.facilityCount
+							supply: this.supply
 						}
 					});
 				}
@@ -386,7 +371,6 @@ export default {
 			else this.currency = "Dollar";
 			if (contract.supply == 1) this.supply = "Internal";
 			else this.supply = "External";
-			this.facilityCount = contract.facilityCount;
 		},
 		notify(type, title, text) {
 			this.$notify({

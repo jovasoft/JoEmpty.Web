@@ -77,11 +77,11 @@
 					<b-form-group label="Tesis Tipi" class="col-md-4">
 						<b-select v-model="facilityType" @blur="$v.facilityType.$touch()">
 							<option value="" disabled>Tesis tipi seçiniz</option>
-							<option value="MR">MR</option>
-							<option value="MRL">MRL</option>
+							<option value="MR">MR (Makine Daireli)</option>
+							<option value="MRL">MRL (Makine Dairesiz)</option>
 							<option value="Hydraulic">Hidrolik</option>
-							<option value="MW">MW</option>
-							<option value="ESC">ESC</option>
+							<option value="MW">MW (Yürüyen Bant)</option>
+							<option value="ESC">ESC (Yürüyen Merdiven)</option>
 						</b-select>
 						<template v-if="$v.facilityType.$error">
 							<small v-if="!$v.facilityType.required" class="form-text text-danger">Tesis tipi boş geçilemez.</small>
@@ -105,9 +105,9 @@
 						</template>
 					</b-form-group>
 					<b-form-group label="Hız (m/s)" class="col-md-4">
-						<b-input v-model="speed" :disabled="!isElevator" @blur="$v.speed.$touch()" @keypress="onlyNumber" placeholder="Hız (m/s)" />
+						<b-input v-model="speed" :disabled="!isElevator" @blur="$v.speed.$touch()" @keypress="onlyFloatingNumber" placeholder="Hız (m/s)" />
 						<template v-if="$v.speed.$error">
-							<small v-if="!$v.speed.required || (!$v.speed.validSpeed && isElevator)" class="form-text text-danger">Hız boş geçilemez.</small>
+							<small v-if="!$v.speed.required || isElevator" class="form-text text-danger">Hız boş geçilemez.</small>
 						</template>
 					</b-form-group>
 					<b-form-group label="Kapasite (kg)" class="col-md-4">
@@ -256,10 +256,7 @@ export default {
 		speed: {
 			required: requiredIf(function() {
 				return this.isElevator;
-			}),
-			validSpeed: function(speed) {
-				return /^\d+$/.test(speed) || !this.isElevator;
-			}
+			})
 		},
 		capacity: {
 			required: requiredIf(function() {
@@ -317,8 +314,16 @@ export default {
 		}
 	},
 	watch: {
+		facilityContractId(contractId) {
+			this.clientContracts.forEach(contract => {
+				if (contract.id == contractId) {
+					this.currentMaintenanceFee = contract.amount;
+				}
+			});
+		},
 		contractClientId(clientId) {
 			this.getContractsByClient(clientId);
+			this.fillAddress(clientId);
 		},
 		facilityType(type) {
 			if (type == "MW") this.isElevator = false;
@@ -432,6 +437,15 @@ export default {
 				} else this.notify("error", "Hata", this.facilityResponse.data.message);
 			} else this.notify("error", "Hata", this.facilityErrorMessage);
 		},
+		fillAddress(clientId) {
+			this.clients.forEach(client => {
+				if (client.id == clientId) {
+					this.address = client.address;
+					this.province = client.province;
+					this.district = client.district;
+				}
+			});
+		},
 		fillForms(facility) {
 			this.contractClientId = facility.clientId;
 			this.facilityContractId = facility.contractId;
@@ -472,11 +486,13 @@ export default {
 			let keyCode = $event.keyCode;
 			if ((keyCode < 48 || keyCode > 57) && keyCode !== 13) $event.preventDefault();
 		},
+		onlyFloatingNumber($event) {
+			let keyCode = $event.keyCode;
+			if ((keyCode < 48 || keyCode > 57) && keyCode !== 13 && keyCode !== 44) $event.preventDefault();
+		},
 		clearForm() {
 			this.$v.$reset();
-			this.client = "";
-			this.contract = "";
-			this.facilityCode = "";
+			(this.contractClientId = ""), (this.facilityContractId = ""), (this.facilityCode = "");
 			this.facilityName = "";
 			this.address = "";
 			this.province = "";

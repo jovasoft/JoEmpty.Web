@@ -113,7 +113,9 @@ export default {
 		})
 	},
 	async created() {
+		this.contractClientId = "Tümü";
 		await this.getClients();
+		this.facilityContractId = "Tümü";
 		if (this.clientId) this.contractClientId = this.clientId;
 	},
 	watch: {

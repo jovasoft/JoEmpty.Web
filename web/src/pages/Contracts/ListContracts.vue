@@ -96,6 +96,7 @@ export default {
 		})
 	},
 	async created() {
+		this.clientId = "Tümü";
 		await this.getClients();
 		if (this.contractsClientId) this.clientId = this.contractsClientId;
 	},
