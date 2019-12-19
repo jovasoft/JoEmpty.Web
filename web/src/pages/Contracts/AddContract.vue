@@ -68,7 +68,7 @@
 					</b-form-group>
 				</b-form-row>
 				<b-form-group label="Dosyalar">
-					<vue-dropzone ref="fileUpload" @vdropzone-success="vsuccess" @vdropzone-error="verror" @vdropzone-removed-file="vremoved" id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" />
+					<vue-dropzone ref="fileUpload" @vdropzone-complete="vcomplete" @vdropzone-file-added="vattachListener" @vdropzone-success="vsuccess" @vdropzone-error="verror" @vdropzone-removed-file="vremoved" id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" />
 				</b-form-group>
 				<b-btn class="btn-flat float-right" type="submit" variant="primary">{{ buttonTitle }}</b-btn>
 			</b-form>
@@ -96,6 +96,7 @@ import { mapGetters } from "vuex";
 import { required } from "vuelidate/lib/validators";
 import { SweetModal } from "sweet-modal-vue";
 import Loading from "vue-loading-overlay";
+import { StorageService } from "@/services/storage.service";
 import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
@@ -111,8 +112,10 @@ export default {
 		Loading
 	},
 	data: () => ({
+		authToken: "",
 		files: [],
 		filesToDelete: [],
+		isUploadComplete: false,
 		errorCount: 0,
 		successCount: 0,
 		isLoading: false,
@@ -137,6 +140,7 @@ export default {
 		tr: tr,
 		dropzoneOptions: {
 			url: "http://localhost:5002/api/Contract/Upload/",
+			headers: { Authorization: `Bearer ${StorageService.getToken()}` },
 			parallelUploads: 10,
 			paramName: "files",
 			uploadMultiple: false,
@@ -145,16 +149,17 @@ export default {
 			acceptedFiles: ".jpg,.jpeg,.png,.pdf,.txt",
 			autoProcessQueue: false,
 			addRemoveLinks: true,
-			dictDefaultMessage: `Dosya yüklemek için tıklayın`,
+			dictRemoveFile: "Dosyayı kaldır",
+			dictDefaultMessage: "Dosya yüklemek için tıklayın",
 			previewTemplate: `
 				<div class="dz-preview dz-file-preview">
 					<div class="dz-details">
 						<div class="dz-thumbnail">
 							<img data-dz-thumbnail>
-							<span class="dz-nopreview">No preview</span>
+							<span class="dz-nopreview">Önizleme yok</span>
 							<div class="dz-success-mark"></div>
 							<div class="dz-error-mark"></div>
-							<div class="dz-error-message">Error</span></div>
+							<div class="dz-error-message">Hata</span></div>
 							<div class="progress"><div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div></div>
 						</div>
 						<div class="dz-filename" data-dz-name></div>
@@ -186,7 +191,11 @@ export default {
 			clientErrorMessage: "client/errorMessage",
 			clientErrorCode: "client/errorCode",
 			clientResponse: "client/response",
-			clientStatus: "client/status"
+			clientStatus: "client/status",
+			fileErrorMessage: "file/errorMessage",
+			fileErrorCode: "file/errorCode",
+			fileResponse: "file/response",
+			fileStatus: "file/status"
 		})
 	},
 	async created() {
@@ -226,6 +235,26 @@ export default {
 		}
 	},
 	methods: {
+		vattachListener: function(addedFile) {
+			if (this.contractEditMode) {
+				var self = this;
+				addedFile.previewElement.addEventListener("click", async function() {
+					if (self.files != null) {
+						self.files.forEach(async file => {
+							if (file.name == addedFile.name) {
+								await this.$store.dispatch("file/Get", {
+									url: file.url,
+									type: file.type
+								});
+							}
+						});
+					}
+				});
+			}
+		},
+		vcomplete() {
+			this.isComplete = true;
+		},
 		vremoved(fileToDelete) {
 			if (this.contractEditMode) {
 				this.files.forEach(file => {
@@ -236,30 +265,34 @@ export default {
 			}
 		},
 		async vsuccess() {
-			this.successCount++;
-			if (this.successCount == this.$refs.fileUpload.getAcceptedFiles().length) {
-				this.successCount = 0;
-				if (!this.contractEditMode) this.showModal();
-				else {
-					this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
-					await this.sleep(1000);
-					this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+			if (this.isComplete) {
+				this.successCount++;
+				if (this.successCount == this.$refs.fileUpload.getAcceptedFiles().length) {
+					this.successCount = 0;
+					if (!this.contractEditMode) this.showModal();
+					else {
+						this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
+						await this.sleep(1000);
+						this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+					}
 				}
 			}
 		},
 		async verror() {
-			this.errorCount++;
-			if (this.errorCount == this.$refs.fileUpload.getAcceptedFiles().length) {
-				this.errorCount = 0;
-				if (!this.contractEditMode) {
-					this.notify("success", "Başarılı", "Sözleşme başarıyla eklendi.");
-					this.notify("error", "Hata", "Dosyalar yüklenirken bir hata oluştu.");
-					await this.sleep(2000);
-					this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
-				} else {
-					this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
-					await this.sleep(1000);
-					this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+			if (this.isComplete) {
+				this.errorCount++;
+				if (this.errorCount == this.$refs.fileUpload.getAcceptedFiles().length) {
+					this.errorCount = 0;
+					if (!this.contractEditMode) {
+						this.notify("success", "Başarılı", "Sözleşme başarıyla eklendi.");
+						this.notify("error", "Hata", "Dosyalar yüklenirken bir hata oluştu.");
+						await this.sleep(2000);
+						this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+					} else {
+						this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
+						await this.sleep(1000);
+						this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+					}
 				}
 			}
 		},
