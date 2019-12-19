@@ -8,6 +8,7 @@ import * as clientContact from "@/store/modules/clientTransactions/clientContact
 import * as contract from "@/store/modules/clientTransactions/contract.js";
 import * as facility from "@/store/modules/clientTransactions/facility.js";
 import * as personal from "@/store/modules/clientTransactions/personal.js";
+import * as file from "@/store/modules/file.js";
 
 Vue.use(Vuex);
 
@@ -20,6 +21,7 @@ export default new Vuex.Store({
 		clientContact,
 		contract,
 		facility,
-		personal
+		personal,
+		file
 	}
 });

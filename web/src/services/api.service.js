@@ -16,6 +16,10 @@ const ApiService = {
 		axios.defaults.headers.common = {};
 	},
 
+	getFile(resource) {
+		return axios.get(resource, { responseType: "arraybuffer" });
+	},
+
 	get(resource) {
 		return axios.get(resource);
 	},

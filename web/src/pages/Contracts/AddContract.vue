@@ -242,10 +242,11 @@ export default {
 					if (self.files != null) {
 						self.files.forEach(async file => {
 							if (file.name == addedFile.name) {
-								await this.$store.dispatch("file/Get", {
+								await self.$store.dispatch("file/Get", {
 									url: file.url,
 									type: file.type
 								});
+								window.open(self.fileResponse, "_blank");
 							}
 						});
 					}
@@ -387,9 +388,13 @@ export default {
 			} else if (this.contractErrorCode != 404) this.notify("error", "Hata", this.contractErrorMessage);
 		},
 		addFilesToDropzone() {
-			this.files.forEach(file => {
+			this.files.forEach(async file => {
 				var newFile = { size: file.size, name: file.name, type: file.type };
-				var url = file.url;
+				await this.$store.dispatch("file/Get", {
+					url: file.url,
+					type: file.type
+				});
+				var url = this.fileResponse;
 				this.$refs.fileUpload.manuallyAddFile(newFile, url);
 			});
 		},
