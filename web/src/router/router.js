@@ -29,6 +29,14 @@ const router = new Router({
 	routes: ROUTES
 });
 
+router.onError(error => {
+	const pattern = /Loading chunk (\d)+ failed/g;
+	const isChunkLoadFailed = error.message.match(pattern);
+	if (isChunkLoadFailed) {
+		window.location.reload();
+	}
+});
+
 router.afterEach(() => {
 	// Remove initial splash screen
 	const splashScreen = document.querySelector(".app-splash-screen");
