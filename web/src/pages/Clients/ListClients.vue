@@ -12,7 +12,7 @@
 				</div>
 			</template>
 		</v-client-table>
-		<sweet-modal width="50%" title="Müşteri Bilgileri" ref="infoModal" :hide-close-button="false">
+		<sweet-modal ref="infoModal" title="Müşteri Bilgileri" width="50%">
 			<b-form>
 				<b-form-row>
 					<b-form-group label="Cari Kod" class="col-md-6">

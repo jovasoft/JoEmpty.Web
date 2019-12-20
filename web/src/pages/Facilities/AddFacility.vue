@@ -322,8 +322,10 @@ export default {
 			});
 		},
 		contractClientId(clientId) {
-			this.getContractsByClient(clientId);
-			this.fillAddress(clientId);
+			if (clientId != "") {
+				this.getContractsByClient(clientId);
+				this.fillAddress(clientId);
+			}
 		},
 		facilityType(type) {
 			if (type == "MW") this.isElevator = false;

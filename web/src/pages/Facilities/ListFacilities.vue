@@ -24,20 +24,97 @@
 			</template>
 			<template slot="edit" slot-scope="props">
 				<div>
+					<b-btn variant="outline-info borderless icon-btn" class="btn-xs" @click.prevent="show(props.row)"><i class="ion ion-md-eye"></i></b-btn>
 					<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="editFacility(props.row)"><i class="ion ion-md-create"></i></b-btn>
 					<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="removeFacility(props.row)"><i class="ion ion-md-close"></i></b-btn>
 				</div>
 			</template>
 		</v-client-table>
+		<sweet-modal ref="infoModal" title="Tesis Bilgileri" width="%50">
+			<b-form class="mb-1">
+				<b-form-row>
+					<b-form-group label="Müşteri" class="col-md-4">
+						<b-input readonly v-model="client" title="Müşteri" />
+					</b-form-group>
+					<b-form-group label="Sözleşme" class="col-md-4">
+						<b-input readonly v-model="contractCode" placeholder="Sözleşme" />
+					</b-form-group>
+					<b-form-group label="Tesis Kodu" class="col-md-4">
+						<b-input readonly v-model="facilityCode" placeholder="Tesis Kodu" />
+					</b-form-group>
+				</b-form-row>
+				<b-form-group label="Tesis Adı">
+					<b-input readonly v-model="facilityName" placeholder="Tesis Adı" />
+				</b-form-group>
+				<b-form-group label="Adres">
+					<b-input readonly v-model="address" placeholder="Cadde/Mahalle" />
+				</b-form-group>
+				<b-form-row>
+					<b-form-group label="İl" class="col-md-4">
+						<b-input readonly v-model="province" placeholder="İl" />
+					</b-form-group>
+					<b-form-group label="İlçe" class="col-md-4">
+						<b-input readonly v-model="district" placeholder="İlçe" />
+					</b-form-group>
+					<b-form-group label="Bölge" class="col-md-4">
+						<b-input readonly v-model="area" placeholder="Bölge" />
+					</b-form-group>
+				</b-form-row>
+				<b-form-row>
+					<b-form-group label="Tesis Tipi" class="col-md-4">
+						<b-input readonly v-model="facilityType" placeholder="Tesis Tipi" />
+					</b-form-group>
+					<b-form-group label="Marka" class="col-md-4">
+						<b-input readonly v-model="brand" placeholder="Marka" />
+					</b-form-group>
+					<b-form-group label="Garanti Bitiş Tarihi" class="col-md-4">
+						<b-input readonly v-model="warrantyDate" placeholder="Garanti Bitiş Tarihi" />
+					</b-form-group>
+				</b-form-row>
+				<b-form-row>
+					<b-form-group label="Durak Sayısı" class="col-md-4">
+						<b-input readonly v-model="stationCount" placeholder="Durak Sayısı" />
+					</b-form-group>
+					<b-form-group label="Hız (m/s)" class="col-md-4">
+						<b-input readonly v-model="speed" placeholder="Hız (m/s)" />
+					</b-form-group>
+					<b-form-group label="Kapasite (kg)" class="col-md-4">
+						<b-input readonly v-model="capacity" placeholder="Kapasite (kg)" />
+					</b-form-group>
+				</b-form-row>
+				<b-form-row>
+					<b-form-group label="Bakım Durumu" class="col-md-3">
+						<b-input readonly v-model="maintenanceStatus" placeholder="Bakım Durumu" />
+					</b-form-group>
+					<b-form-group label="Eski Bakım Ücreti" class="col-md-3">
+						<b-input-group append="₺">
+							<b-input readonly v-model="oldMaintenanceFee" placeholder="Eski Bakım Ücreti" />
+						</b-input-group>
+					</b-form-group>
+					<b-form-group label="Güncel Bakım Ücreti" class="col-md-3">
+						<b-input-group append="₺">
+							<b-input readonly v-model="currentMaintenanceFee" placeholder="Güncel Bakım Ücreti" />
+						</b-input-group>
+					</b-form-group>
+					<b-form-group label="Arıza Ücreti" class="col-md-3">
+						<b-input-group append="₺">
+							<b-input readonly v-model="breakdownFee" placeholder="Arıza Ücreti" />
+						</b-input-group>
+					</b-form-group>
+				</b-form-row>
+			</b-form>
+		</sweet-modal>
 	</div>
 </template>
 
 <style src="@/vendor/libs/vue-data-tables/vue-data-tables.scss" lang="scss"></style>
+<style src="@/vendor/libs/sweet-modal-vue/sweet-modal-vue.scss" lang="scss"></style>
 
 <script>
 import { ClientTable } from "vue-tables-2";
 import Vue from "vue";
 import { mapGetters } from "vuex";
+import { SweetModal } from "sweet-modal-vue";
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
 
@@ -50,9 +127,28 @@ export default {
 	},
 	props: ["clientId", "contractId"],
 	components: {
-		Loading
+		Loading,
+		SweetModal
 	},
 	data: () => ({
+		client: "",
+		contractCode: "",
+		facilityCode: "",
+		facilityName: "",
+		address: "",
+		province: "",
+		district: "",
+		area: "",
+		facilityType: "",
+		brand: "",
+		warrantyDate: "",
+		stationCount: "",
+		speed: "",
+		capacity: "",
+		maintenanceStatus: "",
+		oldMaintenanceFee: "",
+		currentMaintenanceFee: "",
+		breakdownFee: "",
 		isLoading: false,
 		isClientSelected: false,
 		contractClientId: "",
@@ -259,6 +355,56 @@ export default {
 					this.notify("success", "Başarılı", "Tesis başarıyla silindi.");
 				} else this.notify("error", "Hata", this.facilityResponse.data.message);
 			} else this.notify("error", "Hata", this.facilityErrorMessage);
+		},
+		clearModal() {
+			this.client = "";
+			this.contractCode = "";
+			this.facilityCode = "";
+			this.facilityName = "";
+			this.address = "";
+			this.province = "";
+			this.district = "";
+			this.area = "";
+			this.facilityType = "";
+			this.brand = "";
+			this.warrantyDate = "";
+			this.stationCount = "";
+			this.speed = "";
+			this.capacity = "";
+			this.maintenanceStatus = "";
+			this.oldMaintenanceFee = "";
+			this.currentMaintenanceFee = "";
+			this.breakdownFee = "";
+		},
+		show(row) {
+			this.facilities.forEach(facility => {
+				if (facility.id == row.id) {
+					this.clearModal();
+					this.clients.forEach(client => {
+						if (client.id == row.clientId) this.client = client.title;
+					});
+					this.contracts.forEach(contract => {
+						if (contract.id == row.contractId) this.contractCode = contract.code;
+					});
+					this.facilityCode = row.code;
+					this.facilityName = row.name;
+					this.address = row.address;
+					this.province = row.province;
+					this.district = row.district;
+					this.area = row.area; // Area Title
+					this.facilityType = row.type;
+					this.brand = row.brand;
+					this.warrantyDate = row.formattedWarrantyFinishDate;
+					this.stationCount = row.station;
+					this.speed = row.speed;
+					this.capacity = row.capacity;
+					this.maintenanceStatus = row.maintenanceStatus;
+					this.oldMaintenanceFee = row.oldMaintenanceFee;
+					this.currentMaintenanceFee = row.currentMaintenanceFee;
+					this.breakdownFee = row.breakdownFee;
+					this.$refs.infoModal.open();
+				}
+			});
 		},
 		editFacility(row) {
 			this.$router.push({ name: "editFacility", params: { facilityId: row.id } });

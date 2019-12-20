@@ -237,6 +237,119 @@ export default {
 		}
 	},
 	methods: {
+		async getClients() {
+			await this.$store.dispatch("client/Get");
+			if (this.clientResponse != null) {
+				if (this.clientResponse.data.success) {
+					this.clients = this.clientResponse.data.data;
+				} else this.notify("error", "Hata", this.clientResponse.data.message);
+			} else if (this.clientErrorCode != 404) this.notify("error", "Hata", this.clientErrorMessage);
+		},
+		async getContract(contractId) {
+			await this.$store.dispatch("contract/GetOne", contractId);
+			if (this.contractResponse != null) {
+				if (this.contractResponse.data.success) {
+					this.fillForms(this.contractResponse.data.data);
+				} else this.notify("error", "Hata", this.contractResponse.data.message);
+			} else this.notify("error", "Hata", this.contractErrorMessage);
+		},
+		async getFiles(contractId) {
+			await this.$store.dispatch("contract/GetFiles", contractId);
+			if (this.contractResponse != null) {
+				if (this.contractResponse.data.success) {
+					this.files = this.contractResponse.data.data.files;
+					this.addFilesToDropzone();
+				} else this.notify("error", "Hata", this.contractResponse.data.message);
+			} else if (this.contractErrorCode != 404) this.notify("error", "Hata", this.contractErrorMessage);
+		},
+		async addContract() {
+			this.$v.$touch();
+			if (!this.$v.$invalid) {
+				if (!this.contractEditMode) {
+					await this.$store.dispatch("contract/Add", {
+						clientId: this.contractClientId,
+						code: this.contractCode,
+						startDate: this.startDate,
+						finishDate: this.endDate,
+						amount: this.price,
+						currency: this.currency,
+						supply: this.supply
+					});
+				} else {
+					await this.$store.dispatch("contract/Update", {
+						id: this.contractId,
+						contract: {
+							clientId: this.contractClientId,
+							code: this.contractCode,
+							startDate: this.startDate,
+							finishDate: this.endDate,
+							amount: this.price,
+							currency: this.currency,
+							supply: this.supply
+						}
+					});
+				}
+				if (this.contractResponse != null) {
+					if (this.contractResponse.data.success) {
+						if (!this.contractEditMode) {
+							this.newContractId = this.contractResponse.data.data.id;
+							if (this.$refs.fileUpload.getAcceptedFiles().length > 0) {
+								this.$refs.fileUpload.setOption("url", this.dropzoneOptions.url + this.newContractId);
+								this.$refs.fileUpload.processQueue();
+							} else this.showModal();
+						} else {
+							if (this.filesToDelete.length > 0) await this.deleteFiles();
+							if (this.$refs.fileUpload.getAcceptedFiles().length > 0) this.uploadNewFiles();
+							else {
+								this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
+								await this.sleep(1000);
+								this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
+							}
+						}
+					} else this.notify("error", "Hata", this.contractResponse.data.message);
+				} else this.notify("error", "Hata", this.contractErrorMessage);
+			}
+		},
+		async uploadNewFiles() {
+			this.$refs.fileUpload.getAcceptedFiles().forEach(fileToUpload => {
+				this.files.forEach(file => {
+					if (fileToUpload.name == file.name) this.$refs.fileUpload.removeFile(fileToUpload);
+				});
+			});
+			this.$refs.fileUpload.setOption("url", this.dropzoneOptions.url + this.contractId);
+			this.$refs.fileUpload.processQueue();
+		},
+		async deleteFiles() {
+			this.filesToDelete.forEach(async id => {
+				await this.$store.dispatch("contract/DeleteFile", {
+					contractId: this.contractId,
+					fileId: id
+				});
+			});
+		},
+		addFilesToDropzone() {
+			this.files.forEach(async file => {
+				var newFile = { size: file.size, name: file.name, type: file.type };
+				await this.$store.dispatch("file/Get", {
+					url: file.url,
+					type: file.type
+				});
+				var url = this.fileResponse;
+				this.$refs.fileUpload.manuallyAddFile(newFile, url);
+			});
+		},
+		fillForms(contract) {
+			this.contractClientId = contract.clientId;
+			this.contractCode = contract.code;
+			this.startDate = contract.startDate;
+			this.endDate = contract.finishDate;
+			this.price = contract.amount;
+			if (contract.currency == 1) this.currency = "TL";
+			else if (contract.currency == 2) this.currency = "Euro";
+			else this.currency = "Dollar";
+			if (contract.supply == 1) this.supply = "Internal";
+			else this.supply = "External";
+		},
 		vattachListener: function(addedFile) {
 			if (this.contractEditMode) {
 				var self = this;
@@ -301,119 +414,6 @@ export default {
 					}
 				}
 			}
-		},
-		async getClients() {
-			await this.$store.dispatch("client/Get");
-			if (this.clientResponse != null) {
-				if (this.clientResponse.data.success) {
-					this.clients = this.clientResponse.data.data;
-				} else this.notify("error", "Hata", this.clientResponse.data.message);
-			} else if (this.clientErrorCode != 404) this.notify("error", "Hata", this.clientErrorMessage);
-		},
-		async addContract() {
-			this.$v.$touch();
-			if (!this.$v.$invalid) {
-				if (!this.contractEditMode) {
-					await this.$store.dispatch("contract/Add", {
-						clientId: this.contractClientId,
-						code: this.contractCode,
-						startDate: this.startDate,
-						finishDate: this.endDate,
-						amount: this.price,
-						currency: this.currency,
-						supply: this.supply
-					});
-				} else {
-					await this.$store.dispatch("contract/Update", {
-						id: this.contractId,
-						contract: {
-							clientId: this.contractClientId,
-							code: this.contractCode,
-							startDate: this.startDate,
-							finishDate: this.endDate,
-							amount: this.price,
-							currency: this.currency,
-							supply: this.supply
-						}
-					});
-				}
-				if (this.contractResponse != null) {
-					if (this.contractResponse.data.success) {
-						if (!this.contractEditMode) {
-							this.newContractId = this.contractResponse.data.data.id;
-							if (this.$refs.fileUpload.getAcceptedFiles().length > 0) {
-								this.$refs.fileUpload.setOption("url", this.dropzoneOptions.url + this.newContractId);
-								this.$refs.fileUpload.processQueue();
-							} else this.showModal();
-						} else {
-							if (this.filesToDelete.length > 0) await this.deleteFiles();
-							if (this.$refs.fileUpload.getAcceptedFiles().length > 0) this.uploadNewFiles();
-							else {
-								this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
-								await this.sleep(1000);
-								this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
-							}
-						}
-					} else this.notify("error", "Hata", this.contractResponse.data.message);
-				} else this.notify("error", "Hata", this.contractErrorMessage);
-			}
-		},
-		async deleteFiles() {
-			this.filesToDelete.forEach(async id => {
-				await this.$store.dispatch("contract/DeleteFile", {
-					contractId: this.contractId,
-					fileId: id
-				});
-			});
-		},
-		async uploadNewFiles() {
-			this.$refs.fileUpload.getAcceptedFiles().forEach(fileToUpload => {
-				this.files.forEach(file => {
-					if (fileToUpload.name == file.name) this.$refs.fileUpload.removeFile(fileToUpload);
-				});
-			});
-			this.$refs.fileUpload.setOption("url", this.dropzoneOptions.url + this.contractId);
-			this.$refs.fileUpload.processQueue();
-		},
-		async getContract(contractId) {
-			await this.$store.dispatch("contract/GetOne", contractId);
-			if (this.contractResponse != null) {
-				if (this.contractResponse.data.success) {
-					this.fillForms(this.contractResponse.data.data);
-				} else this.notify("error", "Hata", this.contractResponse.data.message);
-			} else this.notify("error", "Hata", this.contractErrorMessage);
-		},
-		async getFiles(contractId) {
-			await this.$store.dispatch("contract/GetFiles", contractId);
-			if (this.contractResponse != null) {
-				if (this.contractResponse.data.success) {
-					this.files = this.contractResponse.data.data.files;
-					this.addFilesToDropzone();
-				} else this.notify("error", "Hata", this.contractResponse.data.message);
-			} else if (this.contractErrorCode != 404) this.notify("error", "Hata", this.contractErrorMessage);
-		},
-		addFilesToDropzone() {
-			this.files.forEach(async file => {
-				var newFile = { size: file.size, name: file.name, type: file.type };
-				await this.$store.dispatch("file/Get", {
-					url: file.url,
-					type: file.type
-				});
-				var url = this.fileResponse;
-				this.$refs.fileUpload.manuallyAddFile(newFile, url);
-			});
-		},
-		fillForms(contract) {
-			this.contractClientId = contract.clientId;
-			this.contractCode = contract.code;
-			this.startDate = contract.startDate;
-			this.endDate = contract.finishDate;
-			this.price = contract.amount;
-			if (contract.currency == 1) this.currency = "TL";
-			else if (contract.currency == 2) this.currency = "Euro";
-			else this.currency = "Dollar";
-			if (contract.supply == 1) this.supply = "Internal";
-			else this.supply = "External";
 		},
 		notify(type, title, text) {
 			this.$notify({
