@@ -68,7 +68,7 @@
 					</b-form-group>
 				</b-form-row>
 				<b-form-group label="Dosyalar">
-					<vue-dropzone ref="fileUpload" @vdropzone-complete="vcomplete" @vdropzone-file-added="vattachListener" @vdropzone-success="vsuccess" @vdropzone-error="verror" @vdropzone-removed-file="vremoved" id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" />
+					<vue-dropzone ref="fileUpload" @vdropzone-sending="vsending" @vdropzone-file-added="vattachListener" @vdropzone-success="vsuccess" @vdropzone-error="verror" @vdropzone-removed-file="vremoved" id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" />
 				</b-form-group>
 				<b-btn class="btn-flat float-right" type="submit" variant="primary">{{ buttonTitle }}</b-btn>
 			</b-form>
@@ -114,7 +114,7 @@ export default {
 	data: () => ({
 		files: [],
 		filesToDelete: [],
-		isUploadComplete: false,
+		isUploadStarted: false,
 		errorCount: 0,
 		successCount: 0,
 		isLoading: false,
@@ -257,8 +257,8 @@ export default {
 				});
 			}
 		},
-		vcomplete() {
-			this.isComplete = true;
+		vsending() {
+			this.isUploadStarted = true;
 		},
 		vremoved(fileToDelete) {
 			if (this.contractEditMode) {
@@ -270,7 +270,7 @@ export default {
 			}
 		},
 		async vsuccess() {
-			if (this.isComplete) {
+			if (this.isUploadStarted) {
 				this.successCount++;
 				if (this.successCount == this.$refs.fileUpload.getAcceptedFiles().length) {
 					this.successCount = 0;
@@ -284,7 +284,7 @@ export default {
 			}
 		},
 		async verror() {
-			if (this.isComplete) {
+			if (this.isUploadStarted) {
 				this.errorCount++;
 				if (this.errorCount == this.$refs.fileUpload.getAcceptedFiles().length) {
 					this.errorCount = 0;
