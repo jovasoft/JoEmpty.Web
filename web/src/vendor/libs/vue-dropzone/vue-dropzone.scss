@@ -40,7 +40,7 @@ $dropzone-icon-block-size: 3.75rem !default;
 
   // Disabled
   &:not(.dz-clickable) {
-    opacity: .5;
+    opacity: 100;
     cursor: not-allowed;
   }
 }

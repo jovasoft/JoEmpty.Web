@@ -112,7 +112,6 @@ export default {
 		Loading
 	},
 	data: () => ({
-		authToken: "",
 		files: [],
 		filesToDelete: [],
 		isUploadComplete: false,
@@ -139,14 +138,14 @@ export default {
 		endDisabledDates: {},
 		tr: tr,
 		dropzoneOptions: {
-			url: "http://localhost:5002/api/Contract/Upload/",
+			url: "http://localhost:5000/api/Contract/Upload/",
 			headers: { Authorization: `Bearer ${StorageService.getToken()}` },
 			parallelUploads: 10,
 			paramName: "files",
 			uploadMultiple: false,
 			maxFilesize: 5000,
 			filesizeBase: 1000,
-			acceptedFiles: ".jpg,.jpeg,.png,.pdf,.txt",
+			acceptedFiles: ".jpg,.jpeg,.png,.pdf,.txt,.docx,.doc",
 			autoProcessQueue: false,
 			addRemoveLinks: true,
 			dictRemoveFile: "Dosyayı kaldır",
@@ -193,7 +192,6 @@ export default {
 			clientResponse: "client/response",
 			clientStatus: "client/status",
 			fileErrorMessage: "file/errorMessage",
-			fileErrorCode: "file/errorCode",
 			fileResponse: "file/response",
 			fileStatus: "file/status"
 		})
@@ -232,6 +230,10 @@ export default {
 		contractStatus(status) {
 			if (status == "loading") this.isLoading = true;
 			else this.isLoading = false;
+		},
+		fileStatus(status) {
+			if (status == "loading") this.isLoading = true;
+			else this.isLoading = false;
 		}
 	},
 	methods: {
@@ -246,7 +248,9 @@ export default {
 									url: file.url,
 									type: file.type
 								});
-								window.open(self.fileResponse, "_blank");
+								if (self.fileResponse != null) {
+									window.open(self.fileResponse, "_blank");
+								} else self.notify("error", "Hata", self.fileErrorMessage);
 							}
 						});
 					}
@@ -291,6 +295,7 @@ export default {
 						this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
 					} else {
 						this.notify("success", "Başarılı", "Sözleşme başarıyla güncellendi.");
+						this.notify("error", "Hata", "Dosyalar yüklenirken bir hata oluştu.");
 						await this.sleep(1000);
 						this.$router.push({ name: "listContracts", params: { contractsClientId: this.contractClientId } });
 					}
