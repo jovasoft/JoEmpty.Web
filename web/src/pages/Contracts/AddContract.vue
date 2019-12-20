@@ -138,7 +138,8 @@ export default {
 		endDisabledDates: {},
 		tr: tr,
 		dropzoneOptions: {
-			url: "http://localhost:5000/api/Contract/Upload/",
+			//url: "http://localhost:5000/api/Contract/Upload/",
+			url: "http://207.154.196.92:5000/api/Contract/Upload/",
 			headers: { Authorization: `Bearer ${StorageService.getToken()}` },
 			parallelUploads: 10,
 			paramName: "files",
