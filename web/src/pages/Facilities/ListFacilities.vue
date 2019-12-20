@@ -30,7 +30,7 @@
 				</div>
 			</template>
 		</v-client-table>
-		<sweet-modal ref="infoModal" title="Tesis Bilgileri" width="%50">
+		<sweet-modal ref="infoModal" title="Tesis Bilgileri" width="60%" :enableMobileFullscreen="true">
 			<b-form class="mb-1">
 				<b-form-row>
 					<b-form-group label="Müşteri" class="col-md-4">
@@ -111,12 +111,12 @@
 <style src="@/vendor/libs/sweet-modal-vue/sweet-modal-vue.scss" lang="scss"></style>
 
 <script>
-import { ClientTable } from "vue-tables-2";
+import "vue-loading-overlay/dist/vue-loading.css";
 import Vue from "vue";
+import { ClientTable } from "vue-tables-2";
 import { mapGetters } from "vuex";
 import { SweetModal } from "sweet-modal-vue";
 import Loading from "vue-loading-overlay";
-import "vue-loading-overlay/dist/vue-loading.css";
 
 Vue.use(ClientTable);
 
@@ -255,19 +255,6 @@ export default {
 		}
 	},
 	methods: {
-		turkishToUpperCase(string) {
-			var letters = { i: "İ", ş: "Ş", ğ: "Ğ", ü: "Ü", ö: "Ö", ç: "Ç", ı: "I" };
-			string = string.replace(/(([iışğüçö]))/g, function(letter) {
-				return letters[letter];
-			});
-			return string.toUpperCase();
-		},
-		filterChange(query) {
-			if (query != "") this.$refs.facilityTable.setFilter(this.turkishToUpperCase(query[0]) + query.slice(1));
-		},
-		sleep(ms) {
-			return new Promise(resolve => setTimeout(resolve, ms));
-		},
 		async getClients() {
 			await this.$store.dispatch("client/Get");
 			if (this.clientResponse != null) {
@@ -418,6 +405,19 @@ export default {
 				ignoreDuplicates: true,
 				duration: 5000
 			});
+		},
+		turkishToUpperCase(string) {
+			var letters = { i: "İ", ş: "Ş", ğ: "Ğ", ü: "Ü", ö: "Ö", ç: "Ç", ı: "I" };
+			string = string.replace(/(([iışğüçö]))/g, function(letter) {
+				return letters[letter];
+			});
+			return string.toUpperCase();
+		},
+		filterChange(query) {
+			if (query != "") this.$refs.facilityTable.setFilter(this.turkishToUpperCase(query[0]) + query.slice(1));
+		},
+		sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
 		}
 	}
 };

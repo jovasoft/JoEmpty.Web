@@ -1,3 +1,5 @@
+@import "../sweet-modal-vue/_mixins";
+
 @-webkit-keyframes pulseWarningOpacity {
   0% { opacity: .3; }
   100% { opacity: 1; }
@@ -41,6 +43,30 @@
     padding-top: 3.5rem;
     padding-bottom: 3.5rem;
   }
+
+  &.is-mobile-fullscreen {
+			
+			@include media(mobile) {
+				& {
+					width: 100% !important;
+					height: 100vh;
+					left: 0;
+					top: 0;
+					transform: scale(0.9);
+					&.is-visible {
+						transform: none;
+					}
+				}
+				.sweet-buttons {
+					@include border-box;
+					position: absolute;
+					bottom: 0;
+					left: 0;
+					width: 100%;
+				}
+			}
+		}
+    
 }
 
 .sweet-modal .pulseWarning {

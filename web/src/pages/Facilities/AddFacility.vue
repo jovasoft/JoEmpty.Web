@@ -171,12 +171,12 @@
 <style src="@/vendor/libs/vuejs-datepicker/vuejs-datepicker.scss" lang="scss"></style>
 
 <script>
-import Datepicker from "vuejs-datepicker";
+import "vue-loading-overlay/dist/vue-loading.css";
 import { tr } from "vuejs-datepicker/dist/locale";
 import { required, requiredIf } from "vuelidate/lib/validators/";
 import { mapGetters } from "vuex";
 import Loading from "vue-loading-overlay";
-import "vue-loading-overlay/dist/vue-loading.css";
+import Datepicker from "vuejs-datepicker";
 
 export default {
 	name: "facilities-add",

@@ -12,7 +12,7 @@
 				</div>
 			</template>
 		</v-client-table>
-		<sweet-modal ref="infoModal" title="Müşteri Bilgileri" width="50%">
+		<sweet-modal ref="infoModal" title="Müşteri Bilgileri" width="60%" :enableMobileFullscreen="true">
 			<b-form>
 				<b-form-row>
 					<b-form-group label="Cari Kod" class="col-md-6">
@@ -46,12 +46,12 @@
 <style src="@/vendor/libs/sweet-modal-vue/sweet-modal-vue.scss" lang="scss"></style>
 
 <script>
+import "vue-loading-overlay/dist/vue-loading.css";
 import Vue from "vue";
 import { ClientTable } from "vue-tables-2";
 import { mapGetters } from "vuex";
-import Loading from "vue-loading-overlay";
 import { SweetModal } from "sweet-modal-vue";
-import "vue-loading-overlay/dist/vue-loading.css";
+import Loading from "vue-loading-overlay";
 
 Vue.use(ClientTable);
 

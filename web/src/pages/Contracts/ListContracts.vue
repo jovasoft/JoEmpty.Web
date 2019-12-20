@@ -22,7 +22,7 @@
 				</div>
 			</template>
 		</v-client-table>
-		<sweet-modal ref="infoModal" title="Sözleşme Bilgileri" width="50%">
+		<sweet-modal ref="infoModal" title="Sözleşme Bilgileri" width="60%" :enableMobileFullscreen="true">
 			<b-form class="mb-1">
 				<b-form-row>
 					<b-form-group label="Müşteri" class="col-md-6">
@@ -61,13 +61,13 @@
 <style src="@/vendor/libs/vue-dropzone/vue-dropzone.scss" lang="scss"></style>
 
 <script>
-import { ClientTable } from "vue-tables-2";
-import vue2Dropzone from "vue2-dropzone";
-import { SweetModal } from "sweet-modal-vue";
-import Vue from "vue";
-import { mapGetters } from "vuex";
-import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
+import Vue from "vue";
+import { ClientTable } from "vue-tables-2";
+import { mapGetters } from "vuex";
+import { SweetModal } from "sweet-modal-vue";
+import Loading from "vue-loading-overlay";
+import vue2Dropzone from "vue2-dropzone";
 
 Vue.use(ClientTable);
 
@@ -196,24 +196,6 @@ export default {
 		}
 	},
 	methods: {
-		vattachListener: function(addedFile) {
-			var self = this;
-			addedFile.previewElement.addEventListener("click", async function() {
-				if (self.files != null) {
-					self.files.forEach(async file => {
-						if (file.name == addedFile.name) {
-							await self.$store.dispatch("file/Get", {
-								url: file.url,
-								type: file.type
-							});
-							if (self.fileResponse != null) {
-								window.open(self.fileResponse, "_blank");
-							} else self.notify("error", "Hata", self.fileErrorMessage);
-						}
-					});
-				}
-			});
-		},
 		async getFiles(contractId) {
 			await this.$store.dispatch("contract/GetFiles", contractId);
 			if (this.contractResponse != null) {
@@ -320,6 +302,24 @@ export default {
 				text: text,
 				ignoreDuplicates: true,
 				duration: 5000
+			});
+		},
+		vattachListener: function(addedFile) {
+			var self = this;
+			addedFile.previewElement.addEventListener("click", async function() {
+				if (self.files != null) {
+					self.files.forEach(async file => {
+						if (file.name == addedFile.name) {
+							await self.$store.dispatch("file/Get", {
+								url: file.url,
+								type: file.type
+							});
+							if (self.fileResponse != null) {
+								window.open(self.fileResponse, "_blank");
+							} else self.notify("error", "Hata", self.fileErrorMessage);
+						}
+					});
+				}
 			});
 		}
 	}

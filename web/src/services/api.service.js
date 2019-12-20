@@ -47,21 +47,8 @@ const ApiService = {
 			},
 			error => {
 				if (error.request.status == 401) {
-					if (error.config.url.include("/o/token/")) {
-						store.dispatch("auth/logout");
-						throw error;
-					} else {
-						try {
-							store.dispatch("auth/refreshToken");
-							return this.customRequest({
-								method: error.config.method,
-								url: error.config.url,
-								data: error.config.data
-							});
-						} catch (e) {
-							throw error;
-						}
-					}
+					store.dispatch("auth/logout");
+					throw error;
 				}
 				throw error;
 			}

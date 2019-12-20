@@ -3,3 +3,20 @@
     color: $color !important;
   }
 }
+
+@mixin border-box {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+@mixin media($type) {
+	@if $type == mobile or $type == phone or $type == tablet {
+		@media screen and (max-width: 600px) {
+			@content;
+		}
+	} @else {
+		@media screen and (min-width: 601px) {
+			@content;
+		}
+	}
+}
