@@ -22,7 +22,7 @@
 				</div>
 			</template>
 		</v-client-table>
-		<sweet-modal ref="infoModal" title="Sözleşme Bilgileri" width="60%" :enableMobileFullscreen="true">
+		<sweet-modal ref="infoModal" title="Sözleşme Bilgileri" width="60%">
 			<b-form class="mb-1">
 				<b-form-row>
 					<b-form-group label="Müşteri" class="col-md-6">
