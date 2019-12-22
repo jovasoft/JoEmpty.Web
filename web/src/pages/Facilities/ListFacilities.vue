@@ -1,109 +1,144 @@
 <template>
-	<div>
-		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
-		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> Tesis Listesi</h4>
-		<hr class="container-m-nx border-light mt-0 mb-3" />
-		<v-client-table ref="facilityTable" :data="facilities" v-on:filter="filterChange" :options="options" :columns="columns">
-			<template slot="beforeFilter">
-				<b-form inline class="mr-3">
-					<label class="mr-2">Müşteri:</label>
-					<b-select v-model="contractClientId">
-						<option value="" disabled>Müşteri seçiniz</option>
-						<option>Tümü</option>
-						<option v-for="(c, index) in clients" :value="c.id" :key="index">{{ c.title }}</option>
-					</b-select>
+	<div class="row">
+		<!-- Title -->
+		<div class="col-md-12">
+			<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Tesisler /</span> Tesis Listesi</h4>
+			<hr class="container-m-nx border-light mt-0 mb-3" />
+		</div>
+		<!-- Table -->
+		<div class="col-md-10">
+			<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
+			<v-client-table ref="facilityTable" :data="facilities" v-on:filter="filterChange" :options="options" :columns="columns">
+				<template slot="beforeFilter">
+					<b-form inline class="mr-3">
+						<label class="mr-2">Müşteri:</label>
+						<b-select v-model="contractClientId">
+							<option value="" disabled>Müşteri seçiniz</option>
+							<option>Tümü</option>
+							<option v-for="(c, index) in clients" :value="c.id" :key="index">{{ c.title }}</option>
+						</b-select>
+					</b-form>
+					<b-form inline class="mr-3">
+						<label class="mr-2">Sözleşme:</label>
+						<b-select :disabled="!isClientSelected" v-model="facilityContractId">
+							<option value="" disabled>Sözleşme seçiniz</option>
+							<option>Tümü</option>
+							<option v-for="(c, index) in contracts" :value="c.id" :key="index">{{ c.code }}</option>
+						</b-select>
+					</b-form>
+				</template>
+				<template slot="edit" slot-scope="props">
+					<div>
+						<b-btn variant="outline-info borderless icon-btn" class="btn-xs" @click.prevent="show(props.row)"><i class="ion ion-md-eye"></i></b-btn>
+						<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="editFacility(props.row)"><i class="ion ion-md-create"></i></b-btn>
+						<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="showRemoveToast(props.row)"><i class="ion ion-md-close"></i></b-btn>
+					</div>
+				</template>
+			</v-client-table>
+			<sweet-modal ref="infoModal" title="Tesis Bilgileri" width="60%">
+				<b-form class="mb-1">
+					<b-form-row>
+						<b-form-group label="Müşteri" class="col-md-4">
+							<b-input readonly v-model="client" title="Müşteri" />
+						</b-form-group>
+						<b-form-group label="Sözleşme" class="col-md-4">
+							<b-input readonly v-model="contractCode" placeholder="Sözleşme" />
+						</b-form-group>
+						<b-form-group label="Tesis Kodu" class="col-md-4">
+							<b-input readonly v-model="facilityCode" placeholder="Tesis Kodu" />
+						</b-form-group>
+					</b-form-row>
+					<b-form-group label="Tesis Adı">
+						<b-input readonly v-model="facilityName" placeholder="Tesis Adı" />
+					</b-form-group>
+					<b-form-group label="Adres">
+						<b-input readonly v-model="address" placeholder="Cadde/Mahalle" />
+					</b-form-group>
+					<b-form-row>
+						<b-form-group label="İl" class="col-md-4">
+							<b-input readonly v-model="province" placeholder="İl" />
+						</b-form-group>
+						<b-form-group label="İlçe" class="col-md-4">
+							<b-input readonly v-model="district" placeholder="İlçe" />
+						</b-form-group>
+						<b-form-group label="Bölge" class="col-md-4">
+							<b-input readonly v-model="area" placeholder="Bölge" />
+						</b-form-group>
+					</b-form-row>
+					<b-form-row>
+						<b-form-group label="Tesis Tipi" class="col-md-4">
+							<b-input readonly v-model="facilityType" placeholder="Tesis Tipi" />
+						</b-form-group>
+						<b-form-group label="Marka" class="col-md-4">
+							<b-input readonly v-model="brand" placeholder="Marka" />
+						</b-form-group>
+						<b-form-group label="Garanti Bitiş Tarihi" class="col-md-4">
+							<b-input readonly v-model="warrantyDate" placeholder="Garanti Bitiş Tarihi" />
+						</b-form-group>
+					</b-form-row>
+					<b-form-row>
+						<b-form-group label="Durak Sayısı" class="col-md-4">
+							<b-input readonly v-model="stationCount" placeholder="Durak Sayısı" />
+						</b-form-group>
+						<b-form-group label="Hız (m/s)" class="col-md-4">
+							<b-input readonly v-model="speed" placeholder="Hız (m/s)" />
+						</b-form-group>
+						<b-form-group label="Kapasite (kg)" class="col-md-4">
+							<b-input readonly v-model="capacity" placeholder="Kapasite (kg)" />
+						</b-form-group>
+					</b-form-row>
+					<b-form-row>
+						<b-form-group label="Bakım Durumu" class="col-md-3">
+							<b-input readonly v-model="maintenanceStatus" placeholder="Bakım Durumu" />
+						</b-form-group>
+						<b-form-group label="Eski Bakım Ücreti" class="col-md-3">
+							<b-input-group append="₺">
+								<b-input readonly v-model="oldMaintenanceFee" placeholder="Eski Bakım Ücreti" />
+							</b-input-group>
+						</b-form-group>
+						<b-form-group label="Güncel Bakım Ücreti" class="col-md-3">
+							<b-input-group append="₺">
+								<b-input readonly v-model="currentMaintenanceFee" placeholder="Güncel Bakım Ücreti" />
+							</b-input-group>
+						</b-form-group>
+						<b-form-group label="Arıza Ücreti" class="col-md-3">
+							<b-input-group append="₺">
+								<b-input readonly v-model="breakdownFee" placeholder="Arıza Ücreti" />
+							</b-input-group>
+						</b-form-group>
+					</b-form-row>
 				</b-form>
-				<b-form inline class="mr-3">
-					<label class="mr-2">Sözleşme:</label>
-					<b-select :disabled="!isClientSelected" v-model="facilityContractId">
-						<option value="" disabled>Sözleşme seçiniz</option>
-						<option>Tümü</option>
-						<option v-for="(c, index) in contracts" :value="c.id" :key="index">{{ c.code }}</option>
-					</b-select>
-				</b-form>
-			</template>
-			<template slot="edit" slot-scope="props">
-				<div>
-					<b-btn variant="outline-info borderless icon-btn" class="btn-xs" @click.prevent="show(props.row)"><i class="ion ion-md-eye"></i></b-btn>
-					<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="editFacility(props.row)"><i class="ion ion-md-create"></i></b-btn>
-					<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="removeFacility(props.row)"><i class="ion ion-md-close"></i></b-btn>
+			</sweet-modal>
+		</div>
+		<!-- Chart -->
+		<div class="col-md-2">
+			<b-card no-body class="mb-4">
+				<b-card-header header-tag="h6" class="bg-info text-white"> <i class="ion ion-md-business"></i>&nbsp; Tesisler </b-card-header>
+				<div class="bg-info text-white">
+					<div class="d-flex align-items-center position-relative mt-4" style="height:140px;">
+						<facility-chart ref="facilityChart" :chart-data="chartData" class="w-100 position-absolute" :height="140" style="top:0" />
+						<div class="w-100 text-center text-xlarge">{{ this.percent }} %</div>
+					</div>
+					<div class="text-center mt-3 mb-4"></div>
 				</div>
-			</template>
-		</v-client-table>
-		<sweet-modal ref="infoModal" title="Tesis Bilgileri" width="60%">
-			<b-form class="mb-1">
-				<b-form-row>
-					<b-form-group label="Müşteri" class="col-md-4">
-						<b-input readonly v-model="client" title="Müşteri" />
-					</b-form-group>
-					<b-form-group label="Sözleşme" class="col-md-4">
-						<b-input readonly v-model="contractCode" placeholder="Sözleşme" />
-					</b-form-group>
-					<b-form-group label="Tesis Kodu" class="col-md-4">
-						<b-input readonly v-model="facilityCode" placeholder="Tesis Kodu" />
-					</b-form-group>
-				</b-form-row>
-				<b-form-group label="Tesis Adı">
-					<b-input readonly v-model="facilityName" placeholder="Tesis Adı" />
-				</b-form-group>
-				<b-form-group label="Adres">
-					<b-input readonly v-model="address" placeholder="Cadde/Mahalle" />
-				</b-form-group>
-				<b-form-row>
-					<b-form-group label="İl" class="col-md-4">
-						<b-input readonly v-model="province" placeholder="İl" />
-					</b-form-group>
-					<b-form-group label="İlçe" class="col-md-4">
-						<b-input readonly v-model="district" placeholder="İlçe" />
-					</b-form-group>
-					<b-form-group label="Bölge" class="col-md-4">
-						<b-input readonly v-model="area" placeholder="Bölge" />
-					</b-form-group>
-				</b-form-row>
-				<b-form-row>
-					<b-form-group label="Tesis Tipi" class="col-md-4">
-						<b-input readonly v-model="facilityType" placeholder="Tesis Tipi" />
-					</b-form-group>
-					<b-form-group label="Marka" class="col-md-4">
-						<b-input readonly v-model="brand" placeholder="Marka" />
-					</b-form-group>
-					<b-form-group label="Garanti Bitiş Tarihi" class="col-md-4">
-						<b-input readonly v-model="warrantyDate" placeholder="Garanti Bitiş Tarihi" />
-					</b-form-group>
-				</b-form-row>
-				<b-form-row>
-					<b-form-group label="Durak Sayısı" class="col-md-4">
-						<b-input readonly v-model="stationCount" placeholder="Durak Sayısı" />
-					</b-form-group>
-					<b-form-group label="Hız (m/s)" class="col-md-4">
-						<b-input readonly v-model="speed" placeholder="Hız (m/s)" />
-					</b-form-group>
-					<b-form-group label="Kapasite (kg)" class="col-md-4">
-						<b-input readonly v-model="capacity" placeholder="Kapasite (kg)" />
-					</b-form-group>
-				</b-form-row>
-				<b-form-row>
-					<b-form-group label="Bakım Durumu" class="col-md-3">
-						<b-input readonly v-model="maintenanceStatus" placeholder="Bakım Durumu" />
-					</b-form-group>
-					<b-form-group label="Eski Bakım Ücreti" class="col-md-3">
-						<b-input-group append="₺">
-							<b-input readonly v-model="oldMaintenanceFee" placeholder="Eski Bakım Ücreti" />
-						</b-input-group>
-					</b-form-group>
-					<b-form-group label="Güncel Bakım Ücreti" class="col-md-3">
-						<b-input-group append="₺">
-							<b-input readonly v-model="currentMaintenanceFee" placeholder="Güncel Bakım Ücreti" />
-						</b-input-group>
-					</b-form-group>
-					<b-form-group label="Arıza Ücreti" class="col-md-3">
-						<b-input-group append="₺">
-							<b-input readonly v-model="breakdownFee" placeholder="Arıza Ücreti" />
-						</b-input-group>
-					</b-form-group>
-				</b-form-row>
-			</b-form>
-		</sweet-modal>
+				<b-card-footer class="border-0 text-center py-3">
+					<div class="row">
+						<div class="col">
+							<div class="text-muted small mb-1">Hedef</div>
+							<strong class="text-big" v-if="this.target">{{ this.target }}</strong>
+							<strong class="text-big" v-else>0</strong>
+						</div>
+						<div class="col">
+							<div class="text-muted small mb-1">Mevcut</div>
+							<strong class="text-big">{{ this.facilities.length }}</strong>
+						</div>
+					</div>
+				</b-card-footer>
+				<b-card-footer class="border-0 text-center py-3">
+					<b-input @keypress="onlyNumber" v-model="target" placeholder="Hedef" />
+				</b-card-footer>
+			</b-card>
+		</div>
 	</div>
 </template>
 
@@ -117,8 +152,11 @@ import { ClientTable } from "vue-tables-2";
 import { mapGetters } from "vuex";
 import { SweetModal } from "sweet-modal-vue";
 import Loading from "vue-loading-overlay";
+import FacilityChart from "../Facilities/FacilityChart";
+import Toasted from "vue-toasted";
 
 Vue.use(ClientTable);
+Vue.use(Toasted);
 
 export default {
 	name: "facilities-list",
@@ -127,10 +165,27 @@ export default {
 	},
 	props: ["clientId", "contractId"],
 	components: {
+		FacilityChart,
 		Loading,
 		SweetModal
 	},
+	beforeRouteLeave(to, from, next) {
+		this.$toasted.clear();
+		next();
+	},
 	data: () => ({
+		percent: "100",
+		target: "",
+		chartData: {
+			datasets: [
+				{
+					data: [100, 0],
+					backgroundColor: ["#fff", "rgba(255,255,255,0.3)"],
+					hoverBackgroundColor: ["#fff", "rgba(255,255,255,0.3)"],
+					borderWidth: 0
+				}
+			]
+		},
 		client: "",
 		contractCode: "",
 		facilityCode: "",
@@ -215,6 +270,21 @@ export default {
 		if (this.clientId) this.contractClientId = this.clientId;
 	},
 	watch: {
+		target(newTarget) {
+			if (newTarget < this.facilities.length) {
+				this.percent = 100;
+			} else this.percent = ((this.facilities.length / newTarget) * 100).toFixed(2);
+			this.chartData = {
+				datasets: [
+					{
+						data: [this.percent, 100 - this.percent],
+						backgroundColor: ["#fff", "rgba(255,255,255,0.3)"],
+						hoverBackgroundColor: ["#fff", "rgba(255,255,255,0.3)"],
+						borderWidth: 0
+					}
+				]
+			};
+		},
 		contractClientId(id) {
 			this.facilities = [];
 			this.facilityContractId = "";
@@ -418,6 +488,40 @@ export default {
 		},
 		sleep(ms) {
 			return new Promise(resolve => setTimeout(resolve, ms));
+		},
+		onlyNumber($event) {
+			let keyCode = $event.keyCode;
+			if ((keyCode < 48 || keyCode > 57) && keyCode !== 13) $event.preventDefault();
+		},
+		showRemoveToast(row) {
+			this.$toasted.clear();
+			const actions = [
+				{
+					text: "Evet",
+					onClick: (e, toastObject) => {
+						this.removeFacility(row);
+						toastObject.goAway(0);
+					},
+					class: `opacity-75 text-dark`
+				},
+				{
+					text: "Hayır",
+					onClick: (e, toastObject) => {
+						toastObject.goAway(0);
+					},
+					class: `opacity-75 text-dark`
+				}
+			];
+			var toastText = '<i class="ion ion-md-information-circle mr-2"></i> ' + row.name + " adlı tesisi silmek istediğinize emin misiniz?";
+			this.$toasted.show(toastText, {
+				theme: "bubble",
+				position: `bottom-center`,
+				action: actions,
+				icon: null,
+				className: `bg-warning text-dark`,
+				duration: 5000,
+				singleton: true
+			});
 		}
 	}
 };

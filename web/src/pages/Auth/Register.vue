@@ -1,5 +1,6 @@
 <template>
 	<b-card no-body>
+		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
 		<!-- Modal -->
 		<b-modal id="modals-default" size="medium" hide-footer="true">
 			<div slot="modal-title">
@@ -134,25 +135,36 @@
 import { required, email, minLength } from "vuelidate/lib/validators/";
 import { mapGetters } from "vuex";
 import PerfectScrollbar from "@/vendor/libs/perfect-scrollbar/PerfectScrollbar";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
 	metaInfo: {
 		title: "Register"
 	},
 	data: () => ({
+		isLoading: false,
 		name: "",
 		lastname: "",
 		email: "",
 		password: ""
 	}),
 	components: {
+		Loading,
 		PerfectScrollbar
 	},
 	computed: {
 		...mapGetters({
+			authenticating: "auth/authenticating",
 			authenticationError: "auth/authenticationError",
 			authenticationErrorCode: "auth/authenticationErrorCode"
 		})
+	},
+	watch: {
+		authenticating(authStatus) {
+			if (authStatus == true) this.isLoading = true;
+			else this.isLoading = false;
+		}
 	},
 	methods: {
 		register: async function() {

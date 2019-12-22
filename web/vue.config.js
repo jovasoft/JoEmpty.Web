@@ -10,8 +10,8 @@ module.exports = {
     /\bvuedraggable\b/
   ],
   chainWebpack: config => {
-    var mode = 'production'
-    //var mode = 'development'
+    //var mode = 'production'
+    var mode = 'development'
     config.module.exports = {
       devtool: (mode === 'development') ? 'inline-source-map' : false,
       mode: mode,

@@ -8,7 +8,7 @@
 				<div>
 					<b-btn variant="outline-info borderless icon-btn" class="btn-xs" @click.prevent="show(props.row)"><i class="ion ion-md-eye"></i></b-btn>
 					<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="edit(props.row)"><i class="ion ion-md-create"></i></b-btn>
-					<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="remove(props.row)"><i class="ion ion-md-close"></i></b-btn>
+					<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="showRemoveToast(props.row)"><i class="ion ion-md-close"></i></b-btn>
 				</div>
 			</template>
 		</v-client-table>
@@ -52,8 +52,10 @@ import { ClientTable } from "vue-tables-2";
 import { mapGetters } from "vuex";
 import { SweetModal } from "sweet-modal-vue";
 import Loading from "vue-loading-overlay";
+import Toasted from "vue-toasted";
 
 Vue.use(ClientTable);
+Vue.use(Toasted);
 
 export default {
 	name: "clients-list",
@@ -136,6 +138,10 @@ export default {
 			}
 		}
 	}),
+	beforeRouteLeave(to, from, next) {
+		this.$toasted.clear();
+		next();
+	},
 	computed: {
 		...mapGetters({
 			clientContactErrorMessage: "clientContact/errorMessage",
@@ -223,6 +229,36 @@ export default {
 			this.province = "";
 			this.district = "";
 			this.notes = "";
+		},
+		showRemoveToast(row) {
+			this.$toasted.clear();
+			const actions = [
+				{
+					text: "Evet",
+					onClick: (e, toastObject) => {
+						this.remove(row);
+						toastObject.goAway(0);
+					},
+					class: `opacity-75 text-dark`
+				},
+				{
+					text: "Hayır",
+					onClick: (e, toastObject) => {
+						toastObject.goAway(0);
+					},
+					class: `opacity-75 text-dark`
+				}
+			];
+			var toastText = '<i class="ion ion-md-information-circle mr-2"></i> ' + row.title + " ünvanlı müşteriyi silmek istediğinize emin misiniz?";
+			this.$toasted.show(toastText, {
+				theme: "bubble",
+				position: `bottom-center`,
+				action: actions,
+				icon: null,
+				className: `bg-warning text-dark`,
+				duration: 5000,
+				singleton: true
+			});
 		}
 	}
 };

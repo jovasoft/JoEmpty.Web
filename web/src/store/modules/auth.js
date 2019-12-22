@@ -1,4 +1,3 @@
-//import axios from "axios";
 import router from "@/router/router";
 import { AuthService, AuthenticationError } from "@/services/auth.service";
 import { StorageService } from "@/services/storage.service";
@@ -61,7 +60,7 @@ export const actions = {
 				if (error.errorCode == 400) {
 					commit("loginError", {
 						errorCode: error.errorCode,
-						errorMessage: "Mail or password is incorrect."
+						errorMessage: "Hatalı kullanıcı adı veya şifre."
 					});
 				} else {
 					commit("loginError", {

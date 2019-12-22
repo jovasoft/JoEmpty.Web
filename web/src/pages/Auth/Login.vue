@@ -1,5 +1,6 @@
 <template>
 	<b-card no-body>
+		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
 		<div class="p-4 p-sm-5">
 			<!-- Logo -->
 			<div class="d-flex justify-content-center align-items-center pb-2 mb-4">
@@ -63,11 +64,18 @@
 <script>
 import { required, email } from "vuelidate/lib/validators/";
 import { mapGetters } from "vuex";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
+
 export default {
 	metaInfo: {
 		title: "Giriş"
 	},
+	components: {
+		Loading
+	},
 	data: () => ({
+		isLoading: false,
 		email: "",
 		password: ""
 	}),
@@ -82,8 +90,15 @@ export default {
 	},
 	computed: {
 		...mapGetters({
+			authenticating: "auth/authenticating",
 			authenticationError: "auth/authenticationError"
 		})
+	},
+	watch: {
+		authenticating(authStatus) {
+			if (authStatus == true) this.isLoading = true;
+			else this.isLoading = false;
+		}
 	},
 	methods: {
 		login: async function() {
