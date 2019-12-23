@@ -11,6 +11,13 @@
 
 // Page transition
 //
+@media only screen and (max-height: 800px) {
+  @media (min-width: 1200px){
+    body {
+      zoom: 0.8;
+    }
+  }
+}
 
 .router-transitions {
   opacity: 1;
