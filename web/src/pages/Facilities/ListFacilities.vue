@@ -112,32 +112,7 @@
 		</div>
 		<!-- Chart -->
 		<div class="col-md-2">
-			<b-card no-body class="mb-4">
-				<b-card-header header-tag="h6" class="bg-info text-white"> <i class="ion ion-md-business"></i>&nbsp; Tesisler </b-card-header>
-				<div class="bg-info text-white">
-					<div class="d-flex align-items-center position-relative mt-4" style="height:140px;">
-						<facility-chart ref="facilityChart" :chart-data="chartData" class="w-100 position-absolute" :height="140" style="top:0" />
-						<div class="w-100 text-center text-xlarge">{{ this.percent }} %</div>
-					</div>
-					<div class="text-center mt-3 mb-4"></div>
-				</div>
-				<b-card-footer class="border-0 text-center py-3">
-					<div class="row">
-						<div class="col">
-							<div class="text-muted small mb-1">Hedef</div>
-							<strong class="text-big" v-if="this.target">{{ this.target }}</strong>
-							<strong class="text-big" v-else>0</strong>
-						</div>
-						<div class="col">
-							<div class="text-muted small mb-1">Mevcut</div>
-							<strong class="text-big">{{ this.facilities.length }}</strong>
-						</div>
-					</div>
-				</b-card-footer>
-				<b-card-footer class="border-0 text-center py-3">
-					<b-input @keypress="onlyNumber" v-model="target" placeholder="Hedef" />
-				</b-card-footer>
-			</b-card>
+			<client-chart :key="clientChartKey" />
 		</div>
 	</div>
 </template>
@@ -152,8 +127,8 @@ import { ClientTable } from "vue-tables-2";
 import { mapGetters } from "vuex";
 import { SweetModal } from "sweet-modal-vue";
 import Loading from "vue-loading-overlay";
-import FacilityChart from "../Facilities/FacilityChart";
 import Toasted from "vue-toasted";
+import ClientChart from "../../components/ClientChart";
 
 Vue.use(ClientTable);
 Vue.use(Toasted);
@@ -165,7 +140,7 @@ export default {
 	},
 	props: ["clientId", "contractId"],
 	components: {
-		FacilityChart,
+		ClientChart,
 		Loading,
 		SweetModal
 	},
@@ -174,18 +149,7 @@ export default {
 		next();
 	},
 	data: () => ({
-		percent: "100",
-		target: "",
-		chartData: {
-			datasets: [
-				{
-					data: [100, 0],
-					backgroundColor: ["#fff", "rgba(255,255,255,0.3)"],
-					hoverBackgroundColor: ["#fff", "rgba(255,255,255,0.3)"],
-					borderWidth: 0
-				}
-			]
-		},
+		clientChartKey: 0,
 		client: "",
 		contractCode: "",
 		facilityCode: "",
@@ -270,21 +234,6 @@ export default {
 		if (this.clientId) this.contractClientId = this.clientId;
 	},
 	watch: {
-		target(newTarget) {
-			if (newTarget < this.facilities.length) {
-				this.percent = 100;
-			} else this.percent = ((this.facilities.length / newTarget) * 100).toFixed(2);
-			this.chartData = {
-				datasets: [
-					{
-						data: [this.percent, 100 - this.percent],
-						backgroundColor: ["#fff", "rgba(255,255,255,0.3)"],
-						hoverBackgroundColor: ["#fff", "rgba(255,255,255,0.3)"],
-						borderWidth: 0
-					}
-				]
-			};
-		},
 		contractClientId(id) {
 			this.facilities = [];
 			this.facilityContractId = "";
@@ -410,6 +359,7 @@ export default {
 			if (this.facilityResponse != null) {
 				if (this.facilityResponse.status == 204) {
 					this.notify("success", "Başarılı", "Tesis başarıyla silindi.");
+					this.clientChartKey += 1;
 				} else this.notify("error", "Hata", this.facilityResponse.data.message);
 			} else this.notify("error", "Hata", this.facilityErrorMessage);
 		},

@@ -90,6 +90,16 @@ const ContractService = {
 		}
 	},
 
+	GetExpiringContracts: async function() {
+		try {
+			const response = await ApiService.get(ApiService.baseAddress + "contract/GetExpiringContracts");
+			return response;
+		} catch (error) {
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
+		}
+	},
+
 	DeleteFile: async function(contractId, fileId) {
 		try {
 			const response = await ApiService.delete(ApiService.baseAddress + "contract/DeleteFile/" + contractId + "/" + fileId);

@@ -50,6 +50,16 @@ const FacilityService = {
 		}
 	},
 
+	GetTotalCount: async function() {
+		try {
+			const response = await ApiService.get(ApiService.baseAddress + "facility/GetTotalCount");
+			return response;
+		} catch (error) {
+			if (!error.response) throw new UpdateError(500, "Sunucuya bağlanılamadı.");
+			else throw new UpdateError(error.response.status, error.response.data.message);
+		}
+	},
+
 	Add: async function(facility) {
 		try {
 			const response = await ApiService.post(ApiService.baseAddress + "facility", facility);

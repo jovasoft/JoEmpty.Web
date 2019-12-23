@@ -1,58 +1,68 @@
 <template>
-	<div>
-		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
-		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Sözleşmeler /</span> Sözleşme Listesi</h4>
-		<hr class="container-m-nx border-light mt-0 mb-3" />
-		<v-client-table :data="contracts" :options="options" :columns="columns">
-			<template slot="beforeFilter">
-				<b-form inline class="mr-3">
-					<label class="mr-2">Müşteri:</label>
-					<b-select v-model="clientId">
-						<option value="" disabled>Müşteri seçiniz</option>
-						<option>Tümü</option>
-						<option v-for="(c, index) in clients" :value="c.id" :key="index">{{ c.title }}</option>
-					</b-select>
+	<div class="row">
+		<!-- Title -->
+		<div class="col-md-12">
+			<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Sözleşmeler /</span> Sözleşme Listesi</h4>
+			<hr class="container-m-nx border-light mt-0 mb-3" />
+		</div>
+		<!-- Table -->
+		<div class="col-md-10">
+			<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
+			<v-client-table :data="contracts" :options="options" :columns="columns">
+				<template slot="beforeFilter">
+					<b-form inline class="mr-3">
+						<label class="mr-2">Müşteri:</label>
+						<b-select v-model="clientId">
+							<option value="" disabled>Müşteri seçiniz</option>
+							<option>Tümü</option>
+							<option v-for="(c, index) in clients" :value="c.id" :key="index">{{ c.title }}</option>
+						</b-select>
+					</b-form>
+				</template>
+				<template slot="edit" slot-scope="props">
+					<div>
+						<b-btn variant="outline-info borderless icon-btn" class="btn-xs" @click.prevent="show(props.row)"><i class="ion ion-md-eye"></i></b-btn>
+						<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="editContract(props.row)"><i class="ion ion-md-create"></i></b-btn>
+						<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="showRemoveToast(props.row)"><i class="ion ion-md-close"></i></b-btn>
+					</div>
+				</template>
+			</v-client-table>
+			<sweet-modal ref="infoModal" title="Sözleşme Bilgileri" width="60%">
+				<b-form class="mb-1">
+					<b-form-row>
+						<b-form-group label="Müşteri" class="col-md-6">
+							<b-input readonly v-model="client" placeholder="Müşteri" />
+						</b-form-group>
+						<b-form-group label="Sözleşme Kodu" class="col-md-6">
+							<b-input readonly v-model="contractCode" placeholder="Sözleşme Kodu" />
+						</b-form-group>
+					</b-form-row>
+					<b-form-row>
+						<b-form-group label="Başlangıç Tarihi" class="col-md-6">
+							<b-input readonly v-model="startDate" />
+						</b-form-group>
+						<b-form-group label="Bitiş Tarihi" class="col-md-6">
+							<b-input readonly v-model="endDate" />
+						</b-form-group>
+					</b-form-row>
+					<b-form-row>
+						<b-form-group label="Tutar" class="col-md-6">
+							<b-input readonly v-model="price" placeholder="Tutar" type="text" class="form-control" />
+						</b-form-group>
+						<b-form-group label="Sarf Malzeme" class="col-md-6">
+							<b-input readonly v-model="supply" />
+						</b-form-group>
+					</b-form-row>
+					<b-form-group label="Dosyalar">
+						<vue-dropzone ref="fileUpload" @vdropzone-file-added="vattachListener" id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" />
+					</b-form-group>
 				</b-form>
-			</template>
-			<template slot="edit" slot-scope="props">
-				<div>
-					<b-btn variant="outline-info borderless icon-btn" class="btn-xs" @click.prevent="show(props.row)"><i class="ion ion-md-eye"></i></b-btn>
-					<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="editContract(props.row)"><i class="ion ion-md-create"></i></b-btn>
-					<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="showRemoveToast(props.row)"><i class="ion ion-md-close"></i></b-btn>
-				</div>
-			</template>
-		</v-client-table>
-		<sweet-modal ref="infoModal" title="Sözleşme Bilgileri" width="60%">
-			<b-form class="mb-1">
-				<b-form-row>
-					<b-form-group label="Müşteri" class="col-md-6">
-						<b-input readonly v-model="client" placeholder="Müşteri" />
-					</b-form-group>
-					<b-form-group label="Sözleşme Kodu" class="col-md-6">
-						<b-input readonly v-model="contractCode" placeholder="Sözleşme Kodu" />
-					</b-form-group>
-				</b-form-row>
-				<b-form-row>
-					<b-form-group label="Başlangıç Tarihi" class="col-md-6">
-						<b-input readonly v-model="startDate" />
-					</b-form-group>
-					<b-form-group label="Bitiş Tarihi" class="col-md-6">
-						<b-input readonly v-model="endDate" />
-					</b-form-group>
-				</b-form-row>
-				<b-form-row>
-					<b-form-group label="Tutar" class="col-md-6">
-						<b-input readonly v-model="price" placeholder="Tutar" type="text" class="form-control" />
-					</b-form-group>
-					<b-form-group label="Sarf Malzeme" class="col-md-6">
-						<b-input readonly v-model="supply" />
-					</b-form-group>
-				</b-form-row>
-				<b-form-group label="Dosyalar">
-					<vue-dropzone ref="fileUpload" @vdropzone-file-added="vattachListener" id="my-dropzone" :duplicateCheck="true" :options="dropzoneOptions" />
-				</b-form-group>
-			</b-form>
-		</sweet-modal>
+			</sweet-modal>
+		</div>
+		<!-- Chart -->
+		<div class="col-md-2">
+			<client-chart :key="clientChartKey" />
+		</div>
 	</div>
 </template>
 
@@ -69,6 +79,7 @@ import { SweetModal } from "sweet-modal-vue";
 import Loading from "vue-loading-overlay";
 import vue2Dropzone from "vue2-dropzone";
 import Toasted from "vue-toasted";
+import ClientChart from "../../components/ClientChart";
 
 Vue.use(ClientTable);
 Vue.use(Toasted);
@@ -79,12 +90,14 @@ export default {
 		title: "Sözleşme Listesi"
 	},
 	components: {
+		ClientChart,
 		vueDropzone: vue2Dropzone,
 		Loading,
 		SweetModal
 	},
 	props: ["contractsClientId"],
 	data: () => ({
+		clientChartKey: 0,
 		isLoading: false,
 		clientId: "",
 		clients: [],
@@ -256,6 +269,7 @@ export default {
 			if (this.contractResponse != null) {
 				if (this.contractResponse.status == 204) {
 					this.notify("success", "Başarılı", "Sözleşme başarıyla silindi.");
+					this.clientChartKey += 1;
 				} else this.notify("error", "Hata", this.contractResponse.data.message);
 			} else this.notify("error", "Hata", this.contractErrorMessage);
 		},

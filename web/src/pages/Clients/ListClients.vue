@@ -1,44 +1,54 @@
 <template>
-	<div>
-		<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
-		<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Müşteriler /</span> Müşteri Listesi</h4>
-		<hr class="container-m-nx border-light mt-0 mb-3" />
-		<v-client-table ref="clientTable" :data="clients" :columns="columns" :options="options">
-			<template slot="edit" slot-scope="props">
-				<div>
-					<b-btn variant="outline-info borderless icon-btn" class="btn-xs" @click.prevent="show(props.row)"><i class="ion ion-md-eye"></i></b-btn>
-					<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="edit(props.row)"><i class="ion ion-md-create"></i></b-btn>
-					<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="showRemoveToast(props.row)"><i class="ion ion-md-close"></i></b-btn>
-				</div>
-			</template>
-		</v-client-table>
-		<sweet-modal ref="infoModal" title="Müşteri Bilgileri" width="60%">
-			<b-form>
-				<b-form-row>
-					<b-form-group label="Cari Kod" class="col-md-6">
-						<b-input readonly v-model="currentCode" placeholder="Cari Kod" />
+	<div class="row">
+		<!-- Title -->
+		<div class="col-md-12">
+			<h4 class="font-weight-bold py-3 mb-3"><span class="text-muted font-weight-light">Müşteriler /</span> Müşteri Listesi</h4>
+			<hr class="container-m-nx border-light mt-0 mb-3" />
+		</div>
+		<!-- Table -->
+		<div class="col-md-10">
+			<loading :active.sync="isLoading" color="#e84c64" :can-cancel="false" :is-full-page="false"></loading>
+			<v-client-table ref="clientTable" :data="clients" :columns="columns" :options="options">
+				<template slot="edit" slot-scope="props">
+					<div>
+						<b-btn variant="outline-info borderless icon-btn" class="btn-xs" @click.prevent="show(props.row)"><i class="ion ion-md-eye"></i></b-btn>
+						<b-btn variant="outline-success borderless icon-btn" class="btn-xs" @click.prevent="edit(props.row)"><i class="ion ion-md-create"></i></b-btn>
+						<b-btn variant="outline-danger borderless icon-btn" class="btn-xs" @click.prevent="showRemoveToast(props.row)"><i class="ion ion-md-close"></i></b-btn>
+					</div>
+				</template>
+			</v-client-table>
+			<sweet-modal ref="infoModal" title="Müşteri Bilgileri" width="60%">
+				<b-form>
+					<b-form-row>
+						<b-form-group label="Cari Kod" class="col-md-6">
+							<b-input readonly v-model="currentCode" placeholder="Cari Kod" />
+						</b-form-group>
+						<b-form-group label="Ünvan" class="col-md-6">
+							<b-input readonly v-model="title" placeholder="Ünvan" />
+						</b-form-group>
+					</b-form-row>
+					<b-form-group label="Adres">
+						<b-input readonly v-model="address" placeholder="Cadde/Mahalle" />
 					</b-form-group>
-					<b-form-group label="Ünvan" class="col-md-6">
-						<b-input readonly v-model="title" placeholder="Ünvan" />
+					<b-form-row>
+						<b-form-group label="İl" class="col-md-6">
+							<b-input readonly v-model="province" placeholder="İl" />
+						</b-form-group>
+						<b-form-group label="İlçe" class="col-md-6">
+							<b-input readonly v-model="district" placeholder="İlçe" />
+						</b-form-group>
+					</b-form-row>
+					<b-form-group label="Notlar">
+						<b-textarea readonly v-model="notes" placeholder="Notlar" :rows="4" :max-rows="6" />
 					</b-form-group>
-				</b-form-row>
-				<b-form-group label="Adres">
-					<b-input readonly v-model="address" placeholder="Cadde/Mahalle" />
-				</b-form-group>
-				<b-form-row>
-					<b-form-group label="İl" class="col-md-6">
-						<b-input readonly v-model="province" placeholder="İl" />
-					</b-form-group>
-					<b-form-group label="İlçe" class="col-md-6">
-						<b-input readonly v-model="district" placeholder="İlçe" />
-					</b-form-group>
-				</b-form-row>
-				<b-form-group label="Notlar">
-					<b-textarea readonly v-model="notes" placeholder="Notlar" :rows="4" :max-rows="6" />
-				</b-form-group>
-			</b-form>
-			<v-client-table :data="clientContacts" :columns="contactColumns" :options="contactTableOptions"> </v-client-table>
-		</sweet-modal>
+				</b-form>
+				<v-client-table :data="clientContacts" :columns="contactColumns" :options="contactTableOptions"> </v-client-table>
+			</sweet-modal>
+		</div>
+		<!-- Chart -->
+		<div class="col-md-2">
+			<client-chart :key="clientChartKey" />
+		</div>
 	</div>
 </template>
 
@@ -53,6 +63,7 @@ import { mapGetters } from "vuex";
 import { SweetModal } from "sweet-modal-vue";
 import Loading from "vue-loading-overlay";
 import Toasted from "vue-toasted";
+import ClientChart from "../../components/ClientChart";
 
 Vue.use(ClientTable);
 Vue.use(Toasted);
@@ -63,10 +74,12 @@ export default {
 		title: "Müşteri Listesi"
 	},
 	components: {
+		ClientChart,
 		Loading,
 		SweetModal
 	},
 	data: () => ({
+		clientChartKey: 0,
 		isLoading: false,
 		clients: [],
 		clientContacts: [],
@@ -183,6 +196,7 @@ export default {
 			if (this.response != null) {
 				if (this.response.status == 204) {
 					this.notify("success", "Başarılı", "Müşteri başarıyla silindi.");
+					this.clientChartKey += 1;
 				} else this.notify("error", "Hata", this.response.data.message);
 			} else this.notify("error", "Hata", this.errorMessage);
 		},

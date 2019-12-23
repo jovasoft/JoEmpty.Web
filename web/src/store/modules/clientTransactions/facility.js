@@ -77,6 +77,19 @@ export const actions = {
 		}
 	},
 
+	async GetTotalCount({ commit }) {
+		try {
+			commit("changeStatus", "loading");
+			const response = await FacilityService.GetTotalCount();
+			commit("success", response);
+		} catch (error) {
+			commit("error", {
+				errorCode: error.errorCode,
+				errorMessage: error.message
+			});
+		}
+	},
+
 	async Add({ commit }, facility) {
 		try {
 			commit("changeStatus", "loading");

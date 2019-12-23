@@ -129,6 +129,19 @@ export const actions = {
 		}
 	},
 
+	async GetExpiringContracts({ commit }) {
+		try {
+			commit("changeStatus", "loading");
+			const response = await ContractService.GetExpiringContracts();
+			commit("success", response);
+		} catch (error) {
+			commit("error", {
+				errorCode: error.errorCode,
+				errorMessage: error.message
+			});
+		}
+	},
+
 	async DeleteFile({ commit }, model) {
 		try {
 			commit("changeStatus", "loading");
