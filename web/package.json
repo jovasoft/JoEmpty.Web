@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@vue/eslint-config-prettier": "^4.0.1",
-    "axios": "~0.18.0",
+    "axios": "~0.21.1",
     "bootstrap": "~4.3.1",
     "bootstrap-vue": "2.0.0-rc.16",
     "c3": "^0.6.7",
