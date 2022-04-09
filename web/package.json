@@ -18,7 +18,7 @@
     "echarts": "^4.5.0",
     "idle-vue": "~2.0.5",
     "ladda": "~2.0.1",
-    "moment": "~2.24.0",
+    "moment": "~2.29.2",
     "nouislider": "~13.1.4",
     "numeral": "~2.0.6",
     "perfect-scrollbar": "~1.4.0",
